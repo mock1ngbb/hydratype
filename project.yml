@@ -1,0 +1,57 @@
+# XcodeGen spec — the reproducible source of truth for HydraType.xcodeproj.
+# Regenerate with:  xcodegen generate   (the .xcodeproj is a build artifact; do not
+# hand-edit it). Two targets share App Group group.com.mock1ngbb.hydratype and both
+# link the local HydraCore SPM package. HydraCore baselines at iOS/macOS 26, so the
+# real FoundationModels @Generable path compiles with the standard Xcode toolchain
+# (no compile-condition needed; see Packages/HydraCore/README.md).
+name: HydraType
+options:
+  bundleIdPrefix: com.mock1ngbb
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+
+packages:
+  HydraCore:
+    path: Packages/HydraCore
+
+targets:
+  HydraType:
+    type: application
+    platform: iOS
+    sources:
+      - App
+    dependencies:
+      - package: HydraCore
+        product: HydraCore
+      - target: HydraTypeKeyboard
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.mock1ngbb.hydratype
+        INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: "YES"
+        CODE_SIGN_ENTITLEMENTS: App/HydraType.entitlements
+        GENERATE_INFOPLIST_FILE: "YES"
+
+  HydraTypeKeyboard:
+    type: app-extension
+    platform: iOS
+    sources:
+      - KeyboardExtension
+    dependencies:
+      - package: HydraCore
+        product: HydraCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.mock1ngbb.hydratype.keyboard
+        CODE_SIGN_ENTITLEMENTS: KeyboardExtension/HydraTypeKeyboard.entitlements
+        INFOPLIST_FILE: KeyboardExtension/Info.plist

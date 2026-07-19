@@ -1,22 +1,11 @@
 // E1-S1 — the guided-generation output type for intent-aware correction.
 //
 // Shape from thread T2: a single best correction + ranked alternates
-// ("you could have also meant") + a no-change flag.
-//
-// FoundationModels' `@Generable` macro drives guided generation on iOS/macOS 26.
-// The macro plugin (`FoundationModelsMacros`) is only present in Xcode's build, NOT
-// in a plain `swift build` from the CLI — so we gate the guided variant behind the
-// `HYDRA_AFM` compilation condition, which the Xcode app/keyboard targets pass via
-// `-D HYDRA_AFM`. Command-line `swift build`/`swift test` compile the byte-identical
-// plain value type below, so the rest of HydraCore — mode engine, store, shadow
-// comparison — and its logic tests run everywhere. The AFM call site in
-// `AFMCorrector` is gated the same way; this type is the shared contract. LOUD, not
-// silent: a build without `HYDRA_AFM` fails at the corrector's throw, never no-ops.
+// ("you could have also meant") + a no-change flag. FoundationModels' `@Generable`
+// macro drives guided generation; the macro plugin ships with Xcode (see Package.swift).
 
-#if HYDRA_AFM
 import FoundationModels
 
-@available(iOS 26.0, macOS 26.0, *)
 @Generable
 public struct CorrectionSuggestion: Equatable, Sendable {
     @Guide(description: "The single best correction of the user's text, preserving intent and tone.")
@@ -35,22 +24,18 @@ public struct CorrectionSuggestion: Equatable, Sendable {
     }
 }
 
-#else
+/// A Sendable snapshot of an in-flight streamed correction. `@Generable`'s own
+/// `PartiallyGenerated` type is not Sendable, so streaming maps into this to cross
+/// async boundaries safely (Swift 6 strict concurrency). Fields are optional because
+/// they fill in progressively — `primary` typically resolves before `alternates`.
+public struct PartialCorrection: Equatable, Sendable {
+    public var primary: String?
+    public var alternates: [String]?
+    public var noChange: Bool?
 
-/// Plain mirror compiled when `HYDRA_AFM` is not set (CLI builds, CI, tests). Field
-/// set is kept identical to the `@Generable` variant so downstream code is
-/// source-compatible. Guided generation is not available here — `AFMCorrector`
-/// throws `CorrectorError.foundationModelsUnavailable` loudly rather than degrading.
-public struct CorrectionSuggestion: Equatable, Sendable, Codable {
-    public var primary: String
-    public var alternates: [String]
-    public var noChange: Bool
-
-    public init(primary: String, alternates: [String] = [], noChange: Bool = false) {
+    public init(primary: String? = nil, alternates: [String]? = nil, noChange: Bool? = nil) {
         self.primary = primary
         self.alternates = alternates
         self.noChange = noChange
     }
 }
-
-#endif

@@ -15,11 +15,6 @@ struct HydraTypeCLI {
     static func main() async {
         FileHandle.standardError.write(Data("hydratype-cli — reading lines from stdin (Ctrl-D to end)\n".utf8))
 
-        guard #available(macOS 26.0, iOS 26.0, *) else {
-            fail("this OS build predates Foundation Models (macOS/iOS 26). Cannot run AFM correction.")
-        }
-
-        #if HYDRA_AFM
         let corrector = AFMCorrector()
         while let line = readLine(strippingNewline: true) {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
@@ -40,9 +35,6 @@ struct HydraTypeCLI {
                 FileHandle.standardError.write(Data("ERROR: \(error)\n".utf8))
             }
         }
-        #else
-        fail("built without HYDRA_AFM — this CLI needs the Xcode/AFM build (swift build -Xswiftc -DHYDRA_AFM on macOS 26).")
-        #endif
     }
 
     static func fail(_ message: String) -> Never {
