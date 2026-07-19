@@ -1,17 +1,19 @@
 // swift-tools-version: 6.0
-// HydraCore — platform-agnostic correction core for hydratype.
-// Per thread T34: this package compiles identically on iOS 26 and macOS 26 with
-// zero platform-conditional code in its public surface. FoundationModels usage is
-// gated with `#if canImport(FoundationModels)` so the package still builds (and its
-// pure-logic tests still run) on toolchains/platforms where AFM is unavailable —
-// LOUD failure at runtime, never a silent compile-out of the public API.
+// HydraCore — shared correction core for hydratype. Compiles identically toward
+// iOS 26 and macOS 26 with zero platform-conditional code (thread T34).
+//
+// Requires the full Xcode toolchain (the FoundationModels `@Generable`/`@Guide` macro
+// plugin ships with Xcode, not the Command Line Tools). On this project's machine
+// `xcode-select` points at Xcode, so plain `swift build`/`swift test` resolve the
+// plugin. FoundationModels APIs are 26+, so the package baseline is 26 — no
+// availability guards needed in the public surface.
 import PackageDescription
 
 let package = Package(
     name: "HydraCore",
     platforms: [
-        .macOS(.v14),
-        .iOS(.v17),
+        .macOS("26.0"),
+        .iOS("26.0"),
     ],
     products: [
         .library(name: "HydraCore", targets: ["HydraCore"]),
@@ -26,10 +28,9 @@ let package = Package(
             name: "hydratype-cli",
             dependencies: ["HydraCore"]
         ),
-        // Runnable logic gate: works with the plain Command Line Tools toolchain
-        // (no XCTest/Testing framework needed), so `swift run hydracore-check`
-        // verifies the pure-logic core in any environment and can be wired into the
-        // cicada pre-push gate. The XCTest suite in Tests/ is the richer Xcode/CI form.
+        // Framework-free runnable logic gate (no XCTest needed): `swift run
+        // hydracore-check` verifies the pure-logic core and is wired into scripts/gate.sh
+        // / the cicada pre-push gate. The XCTest suite in Tests/ is the richer form.
         .executableTarget(
             name: "hydracore-check",
             dependencies: ["HydraCore"]

@@ -1,8 +1,9 @@
 // E1-S1 acceptance: the shared contract type compiles and holds its shape.
-// E1-S2 acceptance (offline half): the unavailability path is LOUD — in a build
-// without HYDRA_AFM, `AFMCorrector.correct` throws, never returns nil/empty.
+// E1-S2 acceptance (offline half): on a host without an available system model,
+// `AFMCorrector.correct` throws a typed CorrectorError — LOUD, never nil/empty.
 
 import XCTest
+import FoundationModels
 @testable import HydraCore
 
 final class CorrectionSuggestionTests: XCTestCase {
@@ -20,16 +21,22 @@ final class CorrectionSuggestionTests: XCTestCase {
         XCTAssertTrue(CorrectorError.emptyResult.description.contains("emptyResult"))
     }
 
-    #if !HYDRA_AFM
-    func testAbsentModelIsLoud() async {
-        do {
-            _ = try await AFMCorrector().correct("i went to teh stroe")
-            XCTFail("expected AFMCorrector to throw in a non-HYDRA_AFM build")
-        } catch let error as CorrectorError {
-            XCTAssertEqual(error, .foundationModelsUnavailable)
-        } catch {
-            XCTFail("expected CorrectorError, got \(error)")
+    // On CI / a Mac without an available system model, correction must fail LOUDLY
+    // with a typed CorrectorError (typically .modelUnavailable), never nil/empty.
+    // Skipped where a model is actually available (a device/host with Apple Intelligence).
+    func testUnavailableModelIsLoud() async throws {
+        let model = SystemLanguageModel.default
+        guard case .available = model.availability else {
+            do {
+                _ = try await AFMCorrector().correct("i went to teh stroe")
+                XCTFail("expected AFMCorrector to throw when the model is unavailable")
+            } catch is CorrectorError {
+                // expected — loud, typed failure
+            } catch {
+                XCTFail("expected CorrectorError, got \(error)")
+            }
+            return
         }
+        throw XCTSkip("system model is available on this host — unavailability path not exercised")
     }
-    #endif
 }

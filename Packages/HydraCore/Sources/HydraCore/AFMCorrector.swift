@@ -6,11 +6,10 @@
 // is hardcoded — we bind to `SystemLanguageModel.default`, which the OS resolves.
 //
 // Loud by default: unavailability throws `CorrectorError.modelUnavailable` (never a
-// silent `nil`). Where FoundationModels can't be imported, every entry point throws
-// `CorrectorError.foundationModelsUnavailable` so a mis-targeted build fails loudly
-// at the call site instead of silently compiling the feature out.
+// silent `nil`); an empty primary throws `CorrectorError.emptyResult`.
 
 import Foundation
+import FoundationModels
 
 /// The tuned instruction string. Correct for INTENT/tone over edit-distance; never
 /// change already-correct text; preserve slang/profanity when intended.
@@ -23,10 +22,6 @@ text is already correct, set noChange to true and return it unchanged. Offer up 
 two alternate intended meanings, most-likely first.
 """
 
-#if HYDRA_AFM
-import FoundationModels
-
-@available(iOS 26.0, macOS 26.0, *)
 public struct AFMCorrector: Sendable {
     private let instructions: String
 
@@ -67,14 +62,12 @@ public struct AFMCorrector: Sendable {
         }
     }
 
-    /// Streaming correction: yields partially-generated snapshots so the UI can show
-    /// `primary` before `alternates` finish (thread T2). The stream finishes when the
-    /// model completes; failures are surfaced by the terminating throw on the
-    /// underlying sequence being converted to a logged, finished stream (LOUD: the
-    /// error is delivered, never swallowed).
+    /// Streaming correction: yields Sendable `PartialCorrection` snapshots so the UI
+    /// can show `primary` before `alternates` finish (thread T2). Failures terminate
+    /// the stream by throwing (LOUD — the error is delivered, never swallowed).
     public func correctStreaming(
         _ text: String
-    ) throws -> AsyncThrowingStream<CorrectionSuggestion.PartiallyGenerated, Error> {
+    ) throws -> AsyncThrowingStream<PartialCorrection, Error> {
         try ensureAvailable()
         let instructions = self.instructions
         return AsyncThrowingStream { continuation in
@@ -86,7 +79,14 @@ public struct AFMCorrector: Sendable {
                         generating: CorrectionSuggestion.self
                     )
                     for try await partial in stream {
-                        continuation.yield(partial.content)
+                        // Map the non-Sendable @Generable snapshot into our Sendable
+                        // type before crossing the continuation boundary.
+                        let content = partial.content
+                        continuation.yield(PartialCorrection(
+                            primary: content.primary,
+                            alternates: content.alternates,
+                            noChange: content.noChange
+                        ))
                     }
                     continuation.finish()
                 } catch {
@@ -97,17 +97,3 @@ public struct AFMCorrector: Sendable {
         }
     }
 }
-
-#else
-
-/// Build without `HYDRA_AFM` (CLI/CI/tests). Every entry point throws loudly so a
-/// mis-targeted build can never silently ship a no-op corrector.
-public struct AFMCorrector: Sendable {
-    public init(instructions: String = hydraCorrectionInstructions) {}
-
-    public func correct(_ text: String) async throws -> CorrectionSuggestion {
-        throw CorrectorError.foundationModelsUnavailable
-    }
-}
-
-#endif
