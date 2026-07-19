@@ -1,0 +1,16 @@
+## macOS / Xcode
+.DS_Store
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xcscmblueprint
+*.moved-aside
+## Swift Package Manager
+.build/
+.swiftpm/
+Packages/
+## Secrets — Zero Local Secrets axiom: never commit creds
+*.env
+.env*
+!.env.example

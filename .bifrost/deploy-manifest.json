@@ -1,0 +1,11 @@
+{
+  "version": "1",
+  "owner": "mockingb1rdblue",
+  "repo": "hydratype",
+  "platform_note": "iOS custom-keyboard extension (Swift + Apple Foundation Models). No Cloudflare-worker deploy target — build/sign/ship is via Xcode / TestFlight. charon-cicada owns intake/policy gating; no auto-deploy target until an Xcode-Cloud or fastlane target is wired.",
+  "targets": [],
+  "secrets": [],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
