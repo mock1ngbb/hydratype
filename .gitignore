@@ -9,7 +9,11 @@ xcuserdata/
 ## Swift Package Manager
 .build/
 .swiftpm/
-Packages/
+# NOTE: Packages/ holds hydratype's OWN source packages (e.g. HydraCore), not
+# checked-out dependencies (modern SPM uses .build/). Do NOT blanket-ignore it —
+# only ignore build artifacts nested inside.
+Packages/*/.build/
+Packages/*/.swiftpm/
 ## Secrets — Zero Local Secrets axiom: never commit creds
 *.env
 .env*
