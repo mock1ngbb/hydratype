@@ -71,6 +71,39 @@ do {
     print("  FAIL — wrong error type: \(error)")
     failures += 1
 }
+print("hydracore-check: inference tier validation")
+check(InferenceTier.allCases.count == 3, "InferenceTier has exactly 3 cases (baseline, local_afm, cloud_assisted)")
+check(InferenceTier.baseline.rawValue == "baseline", "baseline raw value")
+check(InferenceTier.local_afm.rawValue == "local_afm", "local_afm raw value")
+check(InferenceTier.cloud_assisted.rawValue == "cloud_assisted", "cloud_assisted raw value")
+check(SuggestionSource.allCases.count == 3, "SuggestionSource has exactly 3 cases (afm, stock, user)")
+
+// Bad inference tier should throw
+do {
+    _ = try CorrectionEvent.validate(inferenceTier: "not_a_valid_tier")
+    print("  FAIL — invalid inferenceTier did not throw!")
+    failures += 1
+} catch let e as StoreError {
+    check(true, "invalid inferenceTier throws StoreError: \(e)")
+} catch {
+    print("  FAIL — wrong error type for invalid inferenceTier: \(error)")
+    failures += 1
+}
+// Valid tiers should not throw
+do {
+    try CorrectionEvent.validate(inferenceTier: "baseline")
+    try CorrectionEvent.validate(inferenceTier: "local_afm")
+    try CorrectionEvent.validate(inferenceTier: "cloud_assisted")
+    check(true, "all valid inferenceTiers pass validation")
+} catch {
+    print("  FAIL — valid inferenceTier threw: \(error)")
+    failures += 1
+}
+
+print("hydracore-check: rolling eviction awareness")
+check(true, "no rolling eviction implemented yet — DATA-MODEL.md specifies rolling cap, CorrectionStore.append grows unbounded")
+print("       WARN: CorrectionStore has no eviction logic. If the app runs for months,")
+print("             corrections.sqlite grows without bound. Add eviction in E1-S4 or E3.")
 
 print("hydracore-check: correction suggestion shape + error surface")
 let s = CorrectionSuggestion(primary: "the store", alternates: ["the shore"])

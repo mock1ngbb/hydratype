@@ -1,7 +1,7 @@
 # hydratype — Handoff Document
 
 **Date:** 2026-07-27  
-**Session:** Red-team audit fix-up + deck meta tags + commit  
+**Session:** Red-team sweep — learnings, deficiencies, rot, mechanizations  
 **Purpose:** New agent can pick up and continue without re-reading every doc.
 
 ---
@@ -48,14 +48,14 @@ of n-gram/edit-distance.
 | **E1-S1** `CorrectionSuggestion` | `Sources/.../CorrectionSuggestion.swift` | Public `@Generable` struct, Equatable, Sendable, streaming partials |
 | **E1-S2** `CorrectorError` | `Sources/.../CorrectorError.swift` | Typed errors, Equatable, Sendable |
 | **E1-S3** `ModeEngine` | `Sources/.../ModeEngine.swift` | Field classification, mode switching, override, reset |
-| **E1-S4** `CorrectionStore` | `Sources/.../CorrectionStore.swift` | SQLite local event log. **Now thread-safe, loud enum parsing** |
+| **E1-S4** `CorrectionStore` | `Sources/.../CorrectionStore.swift` | SQLite local event log. **Thread-safe, loud enum parsing, inferenceTier validation** |
 | **E1-S5** `AFMCorrector` | `Sources/.../AFMCorrector.swift` | Session wrapper. **Never called** — keyboard is stubbed |
-| **E1b-S1** macOS CLI test rig | `Sources/hydratype-cli/CLI.swift` | `echo "i cant beleive it" | swift run hydratype-cli` works |
-| **E1b-S2** Logic gate | `Sources/hydracore-check/main.swift` | **FIXED** — `scripts/gate.sh` passes |
+| **E1b-S1** macOS CLI test rig | `Sources/hydratype-cli/CLI.swift` | `echo "i cant beleive it" | swift run hydratype-cli` works. **Now exits non-zero on error** |
+| **E1b-S2** Logic gate | `Sources/hydracore-check/main.swift` | `scripts/gate.sh` passes. **InferenceTier + eviction-awareness added** |
 | **E0-S2** Privacy docs | `docs/privacy/DATA-MODEL.md`, `docs/privacy/nutrition-label-draft.md` | Frozen, tier-classified, matches data model |
 | **E5-S1** TestFlight ops doc | `docs/ops/testflight.md` | Procedure ready, blocker named |
-| **E14-S1** Marketing deck | `deck/hydrav11/index.html`, `worker.js`, `wrangler.toml`, `og-image.png` | **LIVE at deck.mock1ngbb.com/hydrav11** — doc links fixed, og:image + canonical |
-| Tests | 10 XCTests | 0 failures, 1 skip (AFM availability — model IS available, skip is correct) |
+| **E14-S1** Marketing deck | `deck/hydrav11/index.html`, `worker.js`, `wrangler.toml`, `og-image.png` | **LIVE at deck.mock1ngbb.com/hydrav11** — og:image, canonical, doc links fixed |
+| Tests | 17 XCTests (was 10) | 0 failures, 3 skips (AFM model present on host). **AFMCorrectorTests, inferenceTier tests added** |
 
 ### 📋 Design-Only (not a line of code)
 
@@ -80,6 +80,7 @@ of n-gram/edit-distance.
 | **No signing identity** | `project.yml:19` (`DEVELOPMENT_TEAM: ""`), `.bifrost/deploy-manifest.json` (`targets: []`) | Apple Developer cert + fastlane/Xcode Cloud lane |
 | **KeychainManager missing** | No file exists | Zero Local Secrets is a doc, not a mechanism |
 | **PrivateAggregator missing** | No file exists | DP noise is a doc, not a mechanism |
+| **Rolling eviction not implemented** | `hydracore-check` prints WARN | `CorrectionStore` grows unbounded — add eviction in E1-S4 or E3 |
 
 ---
 
@@ -107,66 +108,74 @@ of n-gram/edit-distance.
    Base64-inlined in worker.js; served as `image/png` with 7-day CDN cache.
 2. **`canonical` meta tag** — ✅ Added. Points to `https://deck.mock1ngbb.com/hydrav11`.
 
-### Deck fixes applied across sessions
+---
 
-- **Broken doc links** (was `/erebus`/`/`) → replaced with GitHub source + docs links. ✅
-- **`og:image` + `canonical`** — both meta tags added; og:image served inline from worker. ✅
-- **Deployment** — live at version `66c6151a-b367-4683-b8e1-325d251fe26d`.
+## 4. Red-Team Findings — Full Audit
+
+This session performed a full-surface red team audit across all source files, tests,
+configs, docs, spikes, and the live deck. Below is the complete findings table.
+
+### Code-level issues
+
+| # | Finding | Severity | Status | Mechanization |
+|---|---------|----------|--------|---------------|
+| 1 | **No AFMCorrector tests** — 0 tests for the correction session wrapper. `PartialCorrection` streaming type had zero coverage. | HIGH | **FIXED** | `AFMCorrectorTests.swift` created: 6 tests (shape, Equatable, Sendable, error paths, instruction validation) |
+| 2 | **No inferenceTier validation** — `CorrectionEvent.inferenceTier` was a free `String` with no constraint. DATA-MODEL.md defines 3 cohort tags but code accepted anything. | HIGH | **FIXED** | `InferenceTier` enum (`baseline`, `local_afm`, `cloud_assisted`); validation on `append()` and `row(from:)`; XCTest + hydracore-check guard |
+| 3 | **CLI exits 0 on correction failure** — `catch` block printed error to stderr but the `@main` struct's `fail()` was dead code (unreachable). Empty input + correction error → exit 0. | MEDIUM | **FIXED** | `hadErrors` flag now triggers `exit(1)` when any correction fails |
+| 4 | **No rolling eviction in CorrectionStore** — DATA-MODEL.md specifies "rolling cap (e.g. last N rows / 90 days)" but `append()` grows unbounded. App runs for months → `corrections.sqlite` grows without bound. | MEDIUM | **AWARE** | `hydracore-check` prints a structured WARN. Actual eviction needs implementation (E1-S4 or E3) |
+| 5 | **`Package.swift` doesn't declare FoundationModels dependency** — Code imports it unconditionally and it resolves via SDK export, but would fail silently on non-Xcode toolchain. | LOW | **NOTED** | Works in Xcode ecosystem. Add `linkerSettings` if cross-platform support is ever needed |
+| 6 | **`@MainActor` on hydracore-check `check()` function** — `@MainActor` on a non-UI function is misleading, though harmless. | LOW | **NOTED** | Cosmetic — remove `@MainActor` if a style pass is done |
+| 7 | **`CorrectionMode.selectionOnly` never tested** — The mode exists but has no coverage in tests or logic gate. | LOW | **NOTED** | Needs an E2-level test when the keyboard is wired |
+
+### Doc & config rot
+
+| # | Finding | Severity | Status | Mechanization |
+|---|---------|----------|--------|---------------|
+| 8 | **`.cicada-policy.yml` — `last_verified: '2026-07-19'`** — stale by 8 days. The gate had not been re-run since the policy was set. | LOW | **FIXED** | Updated to `'2026-07-27'` |
+| 9 | **`session-1.md` and `session-2.md` were untracked** — Session history existed on disk but wasn't committed. | LOW | **FIXED** | Committed in Session 3 (#5) |
+| 10 | **`docs/ops/testflight.md` blocker named but stale** — §5 names the signing blocker but no progress since filed. | LOW | **NOTED** | Blocked on Apple Developer cert, not a doc issue |
+| 11 | **`docs/slices/00-EPICS-AND-HARDENING.md` says "Buildable now: ✅" for E3, E4, E6** — True in isolation, but E2 is the dependency chain bottleneck. Misleading without reading the gate context. | LOW | **NOTED** | The buildable-now column refers to the epic being independently scoped, not unblocked |
+
+### Testing gaps
+
+| # | Finding | Severity | Status | Mechanization |
+|---|---------|----------|--------|---------------|
+| 12 | **`SuggestionSource` round-trip only tests `.afm`** — `CorrectionStoreTests.testRoundTrip` uses `.afm` and `.stock` but not `.user`. The core path works but edge coverage is incomplete. | LOW | **NOTED** | Coverage adequate for the 3-case enum |
+| 13 | **`.cicada-policy.yml` not validated by any check** — No test verifies the policy file is valid YAML with required fields. | LOW | **NOTED** | Cicada itself validates on push; adding a local check is nice-to-have |
+| 14 | **`Probe.swift` won't compile on this machine** — Uses iOS-only `UIInputViewController`. The `#else` `#warning` fires at build time if the file is included. | N/A | **INTENTIONAL** | Throwaway device-only spike file. Excluded from CI by design |
+
+### Deck & infra gaps
+
+| # | Finding | Severity | Status | Mechanization |
+|---|---------|----------|--------|---------------|
+| 15 | **No `Content-Security-Policy` header in Worker response** — Deck serves with good security headers but no CSP. | LOW | **NOTED** | Add if the deck loads external resources in the future |
+| 16 | **Deck worker.js has duplicate `</html>` before fix** — Was inlined from old worker.js with trailing `</html>\`;` plus new content's `</html>`. Fixed in Session 4. | LOW | **FIXED** | Already cleaned up in Session 4 |
 
 ---
 
-## 4. Session 3 & 4 Fix Progress
+## 5. Session Learnings
 
-### Red-team bugs from Session 2 — all fixed
+### What worked
+- **Worktree branches for commits** — `wt/session3-fixes-*`, `wt/redteam-mechanize-*` pattern works well. Squash-merge to hee-haw, delete branch.
+- **`public extension` for cross-target visibility** — The `validate(inferenceTier:)` method needed public access from `hydracore-check` (separate executable target importing HydraCore).
+- **Incremental test growth** — 10 → 17 XCTests (+70%) with 0 regressions. The logic gate (`hydracore-check`) grows in lockstep with XCTest for the cicada pre-push path.
+- **Gate-first workflow** — Running the gate before any edits catches local build issues immediately. After every change, re-run the gate.
 
-| Finding | Status | Notes |
-|---------|--------|-------|
-| `gate.sh` sandbox failure | **✅ FIXED** | `--disable-sandbox` on `swift build`/`swift test`; direct binary for hydracore-check (avoids `swift run` manifest sandboxing) |
-| `row(from:)` silent fallbacks | **✅ FIXED** | `throws StoreError.parse` on unrecognized `FieldKind`/`SuggestionSource` raw values |
-| `CorrectionStore` not thread-safe | **✅ FIXED** | `OSAllocatedUnfairLock` + `@unchecked Sendable` conformance |
-| `Int32(limit)` silent wrap | **✅ FIXED** | `guard limit <= Int(Int32.max)` before SQL bind |
+### What to watch
+- **`swift run` sandboxing breaks on this machine** — Always use `.build/debug/<binary>` or `swift build --disable-sandbox` / `swift test --disable-sandbox`.
+- **Xcode project is gitignored** — Regenerate from `project.yml` via `scripts/bootstrap-xcode.sh` after any change.
+- **Model dependency**: `FoundationModels` is implicitly provided by the SDK — Package.swift cannot declare it. If cross-toolchain support is needed, add `#if canImport(FoundationModels)` guards.
+- **`XCTSkip` on model-availability tests** — When AFM is available, the unavailability path is skipped. This is correct (the model IS available).
 
-### Deck enhancements (Session 4)
-
-| Item | Status | Notes |
-|------|--------|-------|
-| `og:image` social preview | **✅ FIXED** | 1200×630 PNG generated via Python/Pillow; inlined in worker.js; served as `image/png` |
-| `canonical` meta tag | **✅ FIXED** | Points to `https://deck.mock1ngbb.com/hydrav11` |
-| `.codewhale/` gitignored | **✅ FIXED** | Added to `.gitignore` — runtime state not committed |
-| All changes committed | **✅ DONE** | Squash-merged via worktree branch `wt/session3-fixes-*` onto `hee-haw` |
-
-### Known residual issues (intentional, not deferred)
-
-- **`AFMCorrector.swift` is never called** — keyboard is stubbed per E-SPIKE-1.
-- **No `.github/workflows/`** — never add one; cicada is the only CI/CD.
-- **Xcode project is gitignored** — regenerate from `project.yml` via `bootstrap-xcode.sh`.
-- **`swift run` triggers SPM manifest sandboxing** — always use `.build/debug/<binary>` directly.
-- **KeychainManager and PrivateAggregator are design-only** — no code exists yet.
-
----
-
-## 5. Git State
-
-```
-b101bf1 fix(red-team): gate sandbox, thread-safe store, loud parsing, deck meta tags (#5)
-0fe8bb4 fix(deck): inline og-image.png in worker, add image route (#5 follow)
-3aede21 docs: official stack references, architecture graphs, CLAUDE.md prefix-cache (#4)
-14ee32f feat(E0-S1): Xcode two-target project + live-verified AFM path (#3)
-5f28096 docs: privacy data-model, spikes, TestFlight ops, marketing page (#2)
-f5830c9 feat(HydraCore): shared correction core — E1-S1..S4 + E1b-S1 + logic gate (#1)
-51ae22e docs: epics + fedelm-hardened thin-slice backlog
-48add1a scaffold hydratype: cicada policy, deploy manifest, research thread
-```
-
-**Branch:** `hee-haw` (trunk), ahead of `origin/hee-haw` by 2 commits.  
-**Push blocked:** `origin` push is authorized only after `scripts/gate.sh` passes.
-**Working tree:** Clean.
-
-### Worktree cleanup
-- Worktree `codex/agent-css-rewrite-682783f2` at
-  `../.codewhale-worktrees/hydratype/codex-agent-css-rewrite-682783f2` is stale
-  (same tree as hee-haw) — safe to delete.
-- Temp branch `wt/session3-fixes-*` was squash-merged and deleted.
+### Red flags for the next agent
+- **Do NOT** assume in-extension AFM (H1). E-SPIKE-1 verdict is pending hardware.
+- **Do NOT** add `.github/workflows/*` files. Cicada police will refuse the push.
+- **Do NOT** merge to main directly — use worktree branch → PR → squash.
+- **Never** hardcode a model id (Commodity Intelligence axiom).
+- **Pre-push hook IS wired** — it enforces cicada policy. Run `scripts/gate.sh` before pushing.
+- **`swift run` triggers manifest sandboxing** and fails on this machine. Use `.build/debug/<binary>` directly instead.
+- **`.codewhale/` is in `.gitignore`** — CodeWhale runtime state excluded from version control.
+- **Worktree branches**: create as `wt/<topic>-<unixtimestamp>`, squash-merge to hee-haw, delete.
 
 ---
 
@@ -179,13 +188,17 @@ bash scripts/gate.sh
 
 ### Real correction test (CLI)
 ```sh
-cd Packages/HydraCore
-echo "i cant beleive it" | .build/debug/hydratype-cli
+cd Packages/HydraCore && echo "i cant beleive it" | .build/debug/hydratype-cli
 ```
 
 ### Regenerate Xcode project
 ```sh
 bash scripts/bootstrap-xcode.sh
+```
+
+### Run logic gate directly (fast, no XCTest framework)
+```sh
+cd Packages/HydraCore && .build/debug/hydracore-check
 ```
 
 ### Deploy deck
@@ -197,34 +210,50 @@ cd deck/hydrav11 && npx wrangler deploy
 | File | What it is |
 |------|-----------|
 | `docs/slices/00-EPICS-AND-HARDENING.md` | Epic map + fedelm corrections (read this first) |
-| `docs/slices/01-SLICES.md` | Per-slice backlog (all 322 lines) |
+| `docs/slices/01-SLICES.md` | Per-slice backlog (322 lines) |
 | `docs/ARCHITECTURE.md` | 6 system graphs |
 | `docs/privacy/DATA-MODEL.md` | Frozen data model (every field classified) |
 | `docs/reference/INDEX.md` | Index of per-stack official-doc references |
 | `deck/hydrav11/index.html` | Live marketing deck |
 | `.cicada-policy.yml` | CI/CD policy (no GitHub Actions) |
 | `.bifrost/deploy-manifest.json` | Deploy target manifest |
-| `docs/session-2.md` | Full red-team audit findings (context for the fixes applied) |
+| `docs/session-2.md` | Full red-team audit findings (context for fixes applied) |
 
-### Red flags for the next agent
-- **Do NOT** assume in-extension AFM (H1). E-SPIKE-1 verdict is pending hardware.
-- **Do NOT** add `.github/workflows/*` files. Cicada police will refuse the push.
-- **Do NOT** merge to main directly — use worktree branch → PR → squash.
-- **Never** hardcode a model id (Commodity Intelligence axiom).
-- **Pre-push hook IS wired** — it enforces cicada policy. Run `scripts/gate.sh` before pushing.
-- **`swift run` triggers manifest sandboxing** and fails on this machine. Use `.build/debug/<binary>` directly instead. `swift build --disable-sandbox` works. `swift test --disable-sandbox` works.
-- **Xcode project is gitignored** — regenerate from `project.yml` via `bootstrap-xcode.sh`.
-- **`.codewhale/` is in `.gitignore`** — CodeWhale runtime state excluded from version control.
-- **Worktree branches** were used for Session 3/4 commits — squash-merged and deleted. Use the same pattern for future work.
+### Test summary
+```
+17 XCTests, 0 failures, 3 skipped (AFM model available on host)
+hydracore-check: ALL PASS (mode engine, store round-trip, loud container,
+  inference tier, eviction awareness, suggestion shape + error surface)
+```
 
-### Changes applied this session (Session 4)
+---
+
+## 7. Git State
+
+```
+4ff8a04 fix(red-team): full-surface audit + mechanizations (#6)
+81c0953 docs: update handoff for Session 4 — deck meta tags, wip status, git state
+0fe8bb4 fix(deck): inline og-image.png in worker, add image route (#5 follow)
+b101bf1 fix(red-team): gate sandbox, thread-safe store, loud parsing, deck meta tags (#5)
+3aede21 docs: official stack references, architecture graphs, CLAUDE.md prefix-cache (#4)
+14ee32f feat(E0-S1): Xcode two-target project + live-verified AFM path (#3)
+5f28096 docs: privacy data-model, spikes, TestFlight ops, marketing page (#2)
+f5830c9 feat(HydraCore): shared correction core — E1-S1..S4 + E1b-S1 + logic gate (#1)
+51ae22e docs: epics + fedelm-hardened thin-slice backlog
+48add1a scaffold hydratype: cicada policy, deploy manifest, research thread
+```
+
+**Branch:** `hee-haw` (trunk), ahead of `origin/hee-haw` by 4 commits.  
+**Push blocked:** `origin` push is authorized only after `scripts/gate.sh` passes.  
+**Working tree:** Clean.
+
+### Changes applied this session (Session 5 — Red-team sweep)
 | File | What changed |
 |------|-------------|
-| `scripts/gate.sh` | `--disable-sandbox` on build/test; direct binary for hydracore-check (avoids `swift run` manifest sandbox) |
-| `CorrectionStore.swift` | `OSAllocatedUnfairLock` thread-safety; `@unchecked Sendable`; loud `StoreError.parse` on enum deserialization; `Int32(limit)` overflow guard |
-| `deck/hydrav11/index.html` | Footer links: broken `/erebus`/`/` → GitHub source + docs; added `og:image` + `canonical` meta tags |
-| `deck/hydrav11/og-image.png` | **NEW** — 1200×630 social preview image (dark theme, crest, title) generated via Pillow |
-| `deck/hydrav11/worker.js` | Base64-inlined og-image.png; added fetch handler route for `/og-image.png` with `image/png` content-type |
-| `.gitignore` | Added `.codewhale/` — exclude CodeWhale runtime state |
-| `docs/handoff.md` | This file — updated for next session |
-| `docs/session-1.md`, `docs/session-2.md` | Committed session history (previously untracked) |
+| `Packages/HydraCore/Tests/HydraCoreTests/AFMCorrectorTests.swift` | **NEW** — 6 tests: `PartialCorrection` shape/Equatable/Sendable, all error-case Equatable, unavailability path (×2, skipped when model present), instruction constant validation |
+| `Packages/HydraCore/Sources/HydraCore/CorrectionStore.swift` | `InferenceTier` enum (baseline/local_afm/cloud_assisted); `public extension` with `validate(inferenceTier:)`; validation in `append()` (loud on mismatch); validation in `row(from:)`; `SuggestionSource: CaseIterable` |
+| `Packages/HydraCore/Tests/HydraCoreTests/CorrectionStoreTests.swift` | `testInferenceTierValidation` — valid/invalid/empty tier paths all checked |
+| `Packages/HydraCore/Sources/hydracore-check/main.swift` | InferenceTier case-count + raw-value guard; SuggestionSource case-count guard; `validate()` smoke test; rolling-eviction awareness WARN |
+| `Packages/HydraCore/Sources/hydratype-cli/CLI.swift` | `hadErrors` flag — exits non-zero when any correction fails (was silently exiting 0) |
+| `.cicada-policy.yml` | `last_verified` → `'2026-07-27'` (was `'2026-07-19'`) |
+| `docs/handoff.md` | This file — full red-team findings, learnings, all findings documented |

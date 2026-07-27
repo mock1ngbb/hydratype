@@ -11,10 +11,31 @@ import os
 import SQLite3
 
 /// The source of a suggestion, for honest shadow measurement (E3).
-public enum SuggestionSource: String, Sendable, Codable {
+public enum SuggestionSource: String, Sendable, Codable, CaseIterable {
     case afm
     case stock
     case user
+}
+
+/// Cohort tags classifying the inference path. Every contributed (opt-in) event
+/// carries exactly one. Frozen in docs/privacy/DATA-MODEL.md.
+public enum InferenceTier: String, Sendable, Codable, CaseIterable {
+    /// Stock correction path (no AFM), from host-app calibration (E3-S2).
+    case baseline
+    /// On-device Foundation Models correction.
+    case local_afm
+    /// Correction produced via the cloud/BYO endpoint tier (E7).
+    case cloud_assisted
+}
+
+public extension CorrectionEvent {
+    /// Validate that `inferenceTier` matches one of the defined cohort tags.
+    /// Throws `StoreError.parse` (LOUD) on unrecognized value.
+    public static func validate(inferenceTier tier: String) throws {
+        guard InferenceTier(rawValue: tier) != nil else {
+            throw StoreError.parse("unrecognized inferenceTier '\(tier)' — expected one of: \(InferenceTier.allCases.map(\.rawValue).joined(separator: ", "))")
+        }
+    }
 }
 
 /// One correction event. Mirrors the row shape frozen in docs/privacy/DATA-MODEL.md.
@@ -139,7 +160,8 @@ public final class CorrectionStore: @unchecked Sendable {
     /// Append one event. Returns the assigned row id.
     @discardableResult
     public func append(_ event: CorrectionEvent) throws -> Int64 {
-        try lock.withLock {
+        try CorrectionEvent.validate(inferenceTier: event.inferenceTier)
+        return try lock.withLock {
             let sql = """
             INSERT INTO corrections (ts, field_kind, before, suggested, accepted, source, inference_tier, synced)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?);
@@ -237,6 +259,10 @@ public final class CorrectionStore: @unchecked Sendable {
         let sourceRaw = text(6)
         guard let source = SuggestionSource(rawValue: sourceRaw) else {
             throw StoreError.parse("unrecognized source rawValue '\(sourceRaw)' in row \(sqlite3_column_int64(stmt, 0))")
+        }
+        let tierRaw = text(7)
+        guard tierRaw.isEmpty || InferenceTier(rawValue: tierRaw) != nil else {
+            throw StoreError.parse("unrecognized inferenceTier '\(tierRaw)' in row \(sqlite3_column_int64(stmt, 0))")
         }
         return CorrectionEvent(
             id: sqlite3_column_int64(stmt, 0),
