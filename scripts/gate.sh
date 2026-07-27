@@ -9,12 +9,13 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PKG="$ROOT/Packages/HydraCore"
 
 echo "[gate] swift build (HydraCore)…"
-( cd "$PKG" && swift build )
+( cd "$PKG" && swift build --disable-sandbox )
 
-echo "[gate] swift run hydracore-check…"
-( cd "$PKG" && swift run hydracore-check )
+# swift run triggers sandboxed manifest re-evaluation, so run the binary directly.
+echo "[gate] run hydracore-check (logic gate)…"
+( cd "$PKG" && .build/debug/hydracore-check )
 
 echo "[gate] swift test (XCTest)…"
-( cd "$PKG" && swift test )
+( cd "$PKG" && swift test --disable-sandbox )
 
 echo "[gate] PASS"

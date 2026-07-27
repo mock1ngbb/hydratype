@@ -7,6 +7,7 @@
 // SQLite message — never a silent drop (NORTHSTAR axiom 4).
 
 import Foundation
+import os
 import SQLite3
 
 /// The source of a suggestion, for honest shadow measurement (E3).
@@ -55,6 +56,7 @@ public enum StoreError: Error, CustomStringConvertible {
     case open(String)
     case prepare(String)
     case step(String)
+    case parse(String)
     case containerUnavailable(String)
 
     public var description: String {
@@ -62,6 +64,7 @@ public enum StoreError: Error, CustomStringConvertible {
         case .open(let m): return "StoreError.open: \(m)"
         case .prepare(let m): return "StoreError.prepare: \(m)"
         case .step(let m): return "StoreError.step: \(m)"
+        case .parse(let m): return "StoreError.parse: \(m)"
         case .containerUnavailable(let m): return "StoreError.containerUnavailable: \(m)"
         }
     }
@@ -70,9 +73,10 @@ public enum StoreError: Error, CustomStringConvertible {
 // SQLite wants this transient-destructor for bound text so it copies the bytes.
 private let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
-public final class CorrectionStore {
+public final class CorrectionStore: @unchecked Sendable {
     private var db: OpaquePointer?
     public let path: URL
+    private let lock = OSAllocatedUnfairLock()
 
     /// Open (creating if needed) a store at an explicit file URL. Tests pass a temp
     /// URL; production passes the App Group container path.
@@ -135,94 +139,113 @@ public final class CorrectionStore {
     /// Append one event. Returns the assigned row id.
     @discardableResult
     public func append(_ event: CorrectionEvent) throws -> Int64 {
-        let sql = """
-        INSERT INTO corrections (ts, field_kind, before, suggested, accepted, source, inference_tier, synced)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-        """
-        var stmt: OpaquePointer?
-        guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
-            throw StoreError.prepare(errmsg())
+        try lock.withLock {
+            let sql = """
+            INSERT INTO corrections (ts, field_kind, before, suggested, accepted, source, inference_tier, synced)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+            """
+            var stmt: OpaquePointer?
+            guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
+                throw StoreError.prepare(errmsg())
+            }
+            defer { sqlite3_finalize(stmt) }
+            sqlite3_bind_double(stmt, 1, event.timestamp.timeIntervalSince1970)
+            sqlite3_bind_text(stmt, 2, event.fieldKind.rawValue, -1, SQLITE_TRANSIENT)
+            sqlite3_bind_text(stmt, 3, event.before, -1, SQLITE_TRANSIENT)
+            sqlite3_bind_text(stmt, 4, event.suggested, -1, SQLITE_TRANSIENT)
+            sqlite3_bind_int(stmt, 5, event.accepted ? 1 : 0)
+            sqlite3_bind_text(stmt, 6, event.source.rawValue, -1, SQLITE_TRANSIENT)
+            sqlite3_bind_text(stmt, 7, event.inferenceTier, -1, SQLITE_TRANSIENT)
+            sqlite3_bind_int(stmt, 8, event.synced ? 1 : 0)
+            guard sqlite3_step(stmt) == SQLITE_DONE else {
+                throw StoreError.step(errmsg())
+            }
+            return sqlite3_last_insert_rowid(db)
         }
-        defer { sqlite3_finalize(stmt) }
-        sqlite3_bind_double(stmt, 1, event.timestamp.timeIntervalSince1970)
-        sqlite3_bind_text(stmt, 2, event.fieldKind.rawValue, -1, SQLITE_TRANSIENT)
-        sqlite3_bind_text(stmt, 3, event.before, -1, SQLITE_TRANSIENT)
-        sqlite3_bind_text(stmt, 4, event.suggested, -1, SQLITE_TRANSIENT)
-        sqlite3_bind_int(stmt, 5, event.accepted ? 1 : 0)
-        sqlite3_bind_text(stmt, 6, event.source.rawValue, -1, SQLITE_TRANSIENT)
-        sqlite3_bind_text(stmt, 7, event.inferenceTier, -1, SQLITE_TRANSIENT)
-        sqlite3_bind_int(stmt, 8, event.synced ? 1 : 0)
-        guard sqlite3_step(stmt) == SQLITE_DONE else {
-            throw StoreError.step(errmsg())
-        }
-        return sqlite3_last_insert_rowid(db)
     }
 
     /// The most recent unsynced events, oldest first (upload order), up to `limit`.
     public func recentUnsynced(limit: Int) throws -> [CorrectionEvent] {
-        let sql = """
-        SELECT id, ts, field_kind, before, suggested, accepted, source, inference_tier, synced
-        FROM corrections WHERE synced = 0 ORDER BY ts ASC LIMIT ?;
-        """
-        var stmt: OpaquePointer?
-        guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
-            throw StoreError.prepare(errmsg())
-        }
-        defer { sqlite3_finalize(stmt) }
-        sqlite3_bind_int(stmt, 1, Int32(limit))
+        try lock.withLock {
+            guard limit <= Int(Int32.max) else {
+                throw StoreError.parse("limit \(limit) exceeds Int32.max")
+            }
+            let sql = """
+            SELECT id, ts, field_kind, before, suggested, accepted, source, inference_tier, synced
+            FROM corrections WHERE synced = 0 ORDER BY ts ASC LIMIT ?;
+            """
+            var stmt: OpaquePointer?
+            guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
+                throw StoreError.prepare(errmsg())
+            }
+            defer { sqlite3_finalize(stmt) }
+            sqlite3_bind_int(stmt, 1, Int32(limit))
 
-        var out: [CorrectionEvent] = []
-        while true {
-            let rc = sqlite3_step(stmt)
-            if rc == SQLITE_DONE { break }
-            guard rc == SQLITE_ROW else { throw StoreError.step(errmsg()) }
-            out.append(row(from: stmt))
+            var out: [CorrectionEvent] = []
+            while true {
+                let rc = sqlite3_step(stmt)
+                if rc == SQLITE_DONE { break }
+                guard rc == SQLITE_ROW else { throw StoreError.step(errmsg()) }
+                out.append(try row(from: stmt))
+            }
+            return out
         }
-        return out
     }
 
     /// Mark the given row ids as synced.
     public func markSynced(ids: [Int64]) throws {
-        guard !ids.isEmpty else { return }
-        let placeholders = ids.map { _ in "?" }.joined(separator: ",")
-        let sql = "UPDATE corrections SET synced = 1 WHERE id IN (\(placeholders));"
-        var stmt: OpaquePointer?
-        guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
-            throw StoreError.prepare(errmsg())
-        }
-        defer { sqlite3_finalize(stmt) }
-        for (i, id) in ids.enumerated() {
-            sqlite3_bind_int64(stmt, Int32(i + 1), id)
-        }
-        guard sqlite3_step(stmt) == SQLITE_DONE else {
-            throw StoreError.step(errmsg())
+        try lock.withLock {
+            guard !ids.isEmpty else { return }
+            let placeholders = ids.map { _ in "?" }.joined(separator: ",")
+            let sql = "UPDATE corrections SET synced = 1 WHERE id IN (\(placeholders));"
+            var stmt: OpaquePointer?
+            guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
+                throw StoreError.prepare(errmsg())
+            }
+            defer { sqlite3_finalize(stmt) }
+            for (i, id) in ids.enumerated() {
+                sqlite3_bind_int64(stmt, Int32(i + 1), id)
+            }
+            guard sqlite3_step(stmt) == SQLITE_DONE else {
+                throw StoreError.step(errmsg())
+            }
         }
     }
 
     /// Total row count (for tests / the local dashboard).
     public func count() throws -> Int {
-        var stmt: OpaquePointer?
-        guard sqlite3_prepare_v2(db, "SELECT COUNT(*) FROM corrections;", -1, &stmt, nil) == SQLITE_OK else {
-            throw StoreError.prepare(errmsg())
+        try lock.withLock {
+            var stmt: OpaquePointer?
+            guard sqlite3_prepare_v2(db, "SELECT COUNT(*) FROM corrections;", -1, &stmt, nil) == SQLITE_OK else {
+                throw StoreError.prepare(errmsg())
+            }
+            defer { sqlite3_finalize(stmt) }
+            guard sqlite3_step(stmt) == SQLITE_ROW else { throw StoreError.step(errmsg()) }
+            return Int(sqlite3_column_int(stmt, 0))
         }
-        defer { sqlite3_finalize(stmt) }
-        guard sqlite3_step(stmt) == SQLITE_ROW else { throw StoreError.step(errmsg()) }
-        return Int(sqlite3_column_int(stmt, 0))
     }
 
-    private func row(from stmt: OpaquePointer?) -> CorrectionEvent {
+    private func row(from stmt: OpaquePointer?) throws -> CorrectionEvent {
         func text(_ col: Int32) -> String {
             guard let c = sqlite3_column_text(stmt, col) else { return "" }
             return String(cString: c)
         }
+        let fieldRaw = text(2)
+        guard let fieldKind = FieldKind(rawValue: fieldRaw) else {
+            throw StoreError.parse("unrecognized fieldKind rawValue '\(fieldRaw)' in row \(sqlite3_column_int64(stmt, 0))")
+        }
+        let sourceRaw = text(6)
+        guard let source = SuggestionSource(rawValue: sourceRaw) else {
+            throw StoreError.parse("unrecognized source rawValue '\(sourceRaw)' in row \(sqlite3_column_int64(stmt, 0))")
+        }
         return CorrectionEvent(
             id: sqlite3_column_int64(stmt, 0),
             timestamp: Date(timeIntervalSince1970: sqlite3_column_double(stmt, 1)),
-            fieldKind: FieldKind(rawValue: text(2)) ?? .plain,
+            fieldKind: fieldKind,
             before: text(3),
             suggested: text(4),
             accepted: sqlite3_column_int(stmt, 5) != 0,
-            source: SuggestionSource(rawValue: text(6)) ?? .user,
+            source: source,
             inferenceTier: text(7),
             synced: sqlite3_column_int(stmt, 8) != 0
         )
