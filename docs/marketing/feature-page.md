@@ -159,5 +159,5 @@ over it.
 The through-line: correct for **meaning**, keep it **private** by construction, and **prove
 the claims** with numbers you can audit. That's the compensation you didn't know you had.
 
-*Built to the Bifrost northstar — Zero Local Secrets, loud-by-default failure handling,
+*Built to the Erebus Compact: Zero Local Secrets, loud-by-default failure handling,
 honest measurement. 2026-07-19.*

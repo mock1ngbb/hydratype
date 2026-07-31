@@ -87,7 +87,7 @@ early — each slice ships with a test/acceptance check), Single-Track Developme
 (branch → PR → squash → learnings), Commodity Intelligence (models are swappable;
 never hardcode a model id), Autonomy in Hostility, Justice/Accountability.
 
-**NORTHSTAR operator axioms** — Loud by default (no empty catch, no silent
+**Erebus Compact axioms**: Loud by default (no empty catch, no silent
 `return nil` on error; every fallback logs a structured line), Mechanize-not-md
 (ship a check/test, not a note), Defer-nothing (a blocked slice is FILED with its
 blocker named, never left in prose), Deficiency→file+fix.
