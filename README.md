@@ -34,10 +34,15 @@ that verdict. It is not yet on the App Store, and it is honest about what that m
 
 ## The Erebus Compact
 
-Built to the **Erebus Compact**, the constitution of the House of Hydra: Zero Local Secrets, Loud by
-default, Honest measurement, Commodity Intelligence, Mechanize not md, Defer nothing, Age is not a
-gate, Plan is consent, and File it then fix it. Read the full Compact (9 Articles and the
-antipatterns the Council forbids) at [`deck.mock1ngbb.com/hydrav11/erebus-compact`](https://deck.mock1ngbb.com/hydrav11/erebus-compact).
+Built to the **Erebus Compact**, the constitution of the House of Hydra. Five values come first —
+**ethos** (the typer is the first citizen), **authenticity** (words on screen equal words in code),
+**autonomy** (the author owns their text and their exit rights), **privacy** (on-device by default,
+zero-network keyboard, opt-in differentially-noised telemetry), and **accessibility** (WCAG is the
+law of the land) — then the operational laws of the House: Zero Local Secrets, Loud by default,
+Honest measurement, Commodity Intelligence, Mechanize not md, Defer nothing, Age is not a gate,
+Plan is consent, and File it then fix it. The Council also forbids **dark patterns and deceptive
+marketing** as betrayals of the Compact. Read it in full at
+[`deck.mock1ngbb.com/hydrav11/erebus-compact`](https://deck.mock1ngbb.com/hydrav11/erebus-compact).
 
 ## Building
 
