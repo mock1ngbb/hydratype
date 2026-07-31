@@ -142,7 +142,13 @@ h1 em, h2 em, h3 em { font-style: italic; color: var(--violet-bright); }
   letter-spacing: 0.02em;
 }
 
-/* ── Nav ── */
+/* ── Header (sticky nav, always visible) ── */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--ink);
+}
 nav {
   display: flex;
   align-items: center;
@@ -166,10 +172,13 @@ nav a {
   color: var(--violet-bright);
   text-decoration: none;
   font-size: 0.85rem;
-  padding: 0.35rem 0;
-  transition: color 0.15s;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--ink-3);
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
-nav a:hover { color: var(--cyan); }
+nav a:hover { color: var(--cyan); border-color: var(--cyan); background: var(--ink-2); }
 nav .nav-links { display: flex; gap: 1.5rem; }
 
 /* ── Sections ── */
@@ -370,7 +379,7 @@ a:visited { color: var(--violet); }
   </div>
   <div class="nav-links">
     <a href="#charter">Charter</a>
-    <a href="#receipts">Systems →</a>
+    <a href="#receipts">Systems</a>
   </div>
 </nav>
 </header>
@@ -720,10 +729,11 @@ a:visited { color: var(--violet); }
         App Group smoke test, and macOS CLI test rig are built and passing.
         <strong>E-SPIKE-1</strong> (empirical AFM-in-extension test) is pending hardware validation.
         The keyboard extension is a minimal 4-button proof; full layout and correction
-        wiring are gated behind that spike's verdict. <a href="https://github.com/mock1ngbb/hydratype">Source on GitHub →</a>
+        wiring are gated behind that spike's verdict.
       </p>
 
       <p style="font-size:0.85rem;color:var(--grey-2);margin-top:0.5rem">
+        <a href="https://github.com/mock1ngbb/hydratype">Source on GitHub</a> ·
         <a href="https://github.com/mock1ngbb/hydratype/tree/hee-haw/docs">Documentation</a>
       </p>
 
@@ -753,7 +763,7 @@ a:visited { color: var(--violet); }
     </div>
     <p><strong>House of Hydra</strong> &middot; Charter of 1669 &middot; Amended 2026</p>
     <p>hydratype is <strong>not yet on the App Store</strong>. It is greenfield, in active development, and honest about what that means.</p>
-    <p>Built to the <a href="https://github.com/mock1ngbb">Bifrost Northstar</a>: Zero Local Secrets, loud-by-default failure handling, honest measurement.</p>
+    <p>Built to the <a href="https://deck.mock1ngbb.com/hydrav11/northstar">Bifrost Northstar</a>: Zero Local Secrets, loud-by-default failure handling, honest measurement.</p>
     <p style="margin-top:1rem;font-size:0.75rem;color:var(--grey-1)">
       The Council does not track you. The Council does not sell your data. The Council does not know what &ldquo;engagement optimization&rdquo; means,
       and it has voted not to learn. &ldquo;1669&rdquo; is a bit. The rest is real.
