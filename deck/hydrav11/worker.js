@@ -1131,7 +1131,11 @@ export default {
         }
       );
     }
-    if (url.pathname === '/hydrav11/erebus-compact' || url.pathname === '/erebus-compact' || url.pathname === '/hydrav11/northstar' || url.pathname === '/northstar') {
+    // Stale "Northstar" aliases redirect to the canonical Erebus Compact page.
+    if (url.pathname === '/hydrav11/northstar' || url.pathname === '/northstar') {
+      return Response.redirect('https://deck.mock1ngbb.com/hydrav11/erebus-compact', 307);
+    }
+    if (url.pathname === '/hydrav11/erebus-compact' || url.pathname === '/erebus-compact') {
       return new Response(EREBUS_COMPACT, {
         status: 200,
         headers: {

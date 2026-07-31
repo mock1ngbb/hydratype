@@ -18,4 +18,7 @@ echo "[gate] run hydracore-check (logic gate)…"
 echo "[gate] swift test (XCTest)…"
 ( cd "$PKG" && swift test --disable-sandbox )
 
+echo "[gate] erebus deck integrity (Compact constitution stays synced)…"
+( cd "$ROOT" && ./scripts/check-erebus-sync.sh )
+
 echo "[gate] PASS"

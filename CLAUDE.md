@@ -65,6 +65,29 @@ what will fire (the enforcement is not this markdown):
 - **Xcode project**: `.xcodeproj` is gitignored and generated from `project.yml`; the
   gitignore is the mechanism that prevents committing a hand-edited project.
 
+## Constitution — The Erebus Compact
+
+The project's governing constitution. **Values first, then operational laws, then antipatterns.**
+Full text: [`deck/hydrav11/erebus-compact.html`](deck/hydrav11/erebus-compact.html) · live at
+[`deck.mock1ngbb.com/hydrav11/erebus-compact`](https://deck.mock1ngbb.com/hydrav11/erebus-compact).
+New work must stay aligned with these; `scripts/gate.sh` enforces the deck copies stay consistent.
+
+**Values (Articles I–V):**
+- **Ethos** — the typer is the first citizen; tools, not traps; simplicity is integrity.
+- **Authenticity** — words on screen = words in code; claim no fact we can't prove; keep the typer's voice.
+- **Autonomy** — the author owns their text; every setting changeable, model swappable; exit rights are the point.
+- **Privacy** — on-device by default; keyboard does zero networking; opt-in differentially-noised telemetry; keys in the Keychain, never on disk.
+- **Accessibility** — WCAG is law; the House is open to every hand; accessibility is the trunk, not a branch.
+
+**Operational laws (Articles VI–XIV):** Zero Local Secrets · Loud by default · Honest measurement ·
+Commodity Intelligence · Mechanize-not-md · Defer nothing · Age is not a gate · Plan is consent ·
+File-then-fix deprecations.
+
+**Forbidden antipatterns:** dark patterns & deceptive marketing (pre-checked consent, confirm-shaming,
+unequal opt-out, hidden controls, undisclosed harvest, phantom "anonymous", false urgency, unbribed
+numbers, whitewashed claims, sanitizing the typer's voice) and the House's mechanical antipatterns
+(silent ledger, hardcoded secrets/model ids, duplicated work, deferring, chasing symptoms).
+
 Design axioms the code is held to (verified by the gate, not by memory): Loud-by-default
 (typed errors, no silent nil/empty), Commodity Intelligence (no hardcoded model id),
 Mechanize-not-md, Defer-nothing (`wyrd "title"`).
