@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>hydratype — Article IV of the House of Hydra, Amended 2026</title>
-<meta name="description" content="The keyboard that reads the room before it corrects your typo. Article IV of the Charter — on-device intent-aware autocorrect via Apple Foundation Models.">
-<meta property="og:title" content="hydratype — House of Hydra, Article IV">
+<title>hydratype: Article IV of the House of Hydra, Amended 2026</title>
+<meta name="description" content="The keyboard that reads the room before it corrects your typo. Article IV of the Charter: on-device intent-aware autocorrect via Apple Foundation Models.">
+<meta property="og:title" content="hydratype: House of Hydra, Article IV">
 <meta property="og:description" content="The keyboard that reads the room before it corrects your typo. On-device. Intent-aware. Systems-anarchist since 1669.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://deck.mock1ngbb.com/hydrav11">
@@ -13,49 +13,91 @@
 <link rel="canonical" href="https://deck.mock1ngbb.com/hydrav11">
 <meta name="robots" content="index, follow">
 <style>
+/* ════════════════════════════════════════════════════════════
+   EREBUS dark theme · rift-runes · WCAG AA 2.2
+   Source: rift-runes/themes/erebus-dark.css (mechanically audited
+   by rift-runes/scripts/wcag-audit.py). Every text pairing below
+   passes 4.5:1 on --ink and --ink-2.
+   ════════════════════════════════════════════════════════════ */
+:root {
+  /* Surfaces */
+  --ink:    #0A0A0B;   /* page bg            */
+  --ink-2:  #111114;   /* card / code bg     */
+  --ink-3:  #17171B;   /* raised             */
+  --line:   #26262C;   /* 1px borders        */
+  --line-2: #1C1C21;
+  /* Type greys: ALL pass 4.5:1 on --ink and --ink-2 */
+  --grey-4: #E8E8EA;   /* body text   16.17:1 */
+  --grey-3: #B5B5BD;   /* secondary    9.72:1 */
+  --grey-2: #8B8B95;   /* labels/meta  5.87:1 */
+  --grey-1: #7C7C85;   /* dim meta     4.79:1 */
+  /* Accents: text-safe on ink */
+  --violet:        #A855F7;   /* 5.00:1 */
+  --violet-bright: #C084FC;   /* 7.49:1 */
+  --cyan:          #22D3EE;   /* 10.95:1 */
+  --lime:          #A3E635;   /* 13.12:1 */
+  --amber:         #F5A524;   /* 9.70:1  */
+  --rose:          #F07178;   /* 6.92:1  */
+  --violet-soft: rgba(168, 85, 247, 0.08);
+  /* Type */
+  --font-display: "Instrument Serif", "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-body: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
 /* ── Reset & base ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
-  line-height: 1.6;
-  color: #e6edf3;
-  background: #0b0f17;
+  line-height: 1.7;
+  color: var(--grey-4);
+  background: var(--ink);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
 /* ── Typography ── */
 h1, h2, h3, .theater, .seal-text {
-  font-family: "Georgia", "Times New Roman", "Palatino", serif;
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--grey-4);
+  text-wrap: balance;
 }
 h1 {
   font-size: clamp(2rem, 5vw, 3.5rem);
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   line-height: 1.15;
-  color: #f0f6fc;
 }
 h2 {
   font-size: clamp(1.4rem, 3vw, 2rem);
-  font-weight: 400;
-  color: #e6edf3;
+  letter-spacing: -0.01em;
+  line-height: 1.14;
   margin-bottom: 1rem;
 }
 h3 {
   font-size: 1.2rem;
-  font-weight: 400;
-  color: #f0f6fc;
+  line-height: 1.14;
   margin-bottom: 0.5rem;
 }
+.feature-card h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
 .subtitle {
   font-size: clamp(1rem, 2.5vw, 1.3rem);
-  color: #8b949e;
+  color: var(--grey-2);
   max-width: 40em;
   line-height: 1.5;
 }
-.mono { font-family: "SF Mono", "Cascadia Code", "JetBrains Mono", "Fira Code", monospace; font-size: 0.9em; }
-.small { font-size: 0.85rem; color: #8b949e; }
+.mono {
+  font-family: var(--font-body);
+  font-size: 0.9em;
+  color: var(--cyan);
+  background: var(--ink-2);
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  padding: 0.1em 0.35em;
+}
+.small { font-size: 0.85rem; color: var(--grey-2); }
 
 /* ── Layout ── */
 .container { width: 100%; max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
@@ -63,7 +105,7 @@ h3 {
 /* ── Hero ── */
 .hero {
   padding: 5rem 0 3rem;
-  border-bottom: 1px solid #21262d;
+  border-bottom: 1px solid var(--line);
   position: relative;
 }
 .hero::before {
@@ -74,7 +116,7 @@ h3 {
   width: 3.5rem;
   height: 4rem;
   opacity: 0.15;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'%3E%3Cpath d='M50 5 L90 25 L90 70 Q90 100 50 115 Q10 100 10 70 L10 25 Z' fill='none' stroke='%23f0f6fc' stroke-width='3'/%3E%3Cpath d='M35 50 L50 35 L65 50 L50 65 Z' fill='none' stroke='%23f0f6fc' stroke-width='2'/%3E%3Cpath d='M20 30 Q50 40 80 30' fill='none' stroke='%23f0f6fc' stroke-width='1.5' opacity='0.6'/%3E%3Ctext x='50' y='90' text-anchor='middle' font-family='Georgia,serif' font-size='10' fill='%23f0f6fc'%3E1669%3C/text%3E%3C/svg%3E") no-repeat;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'%3E%3Cpath d='M50 5 L90 25 L90 70 Q90 100 50 115 Q10 100 10 70 L10 25 Z' fill='none' stroke='%23E8E8EA' stroke-width='3'/%3E%3Cpath d='M35 50 L50 35 L65 50 L50 65 Z' fill='none' stroke='%23E8E8EA' stroke-width='2'/%3E%3Cpath d='M20 30 Q50 40 80 30' fill='none' stroke='%23E8E8EA' stroke-width='1.5' opacity='0.6'/%3E%3Ctext x='50' y='90' text-anchor='middle' font-family='Georgia,serif' font-size='10' fill='%23E8E8EA'%3E1669%3C/text%3E%3C/svg%3E") no-repeat;
   background-size: contain;
 }
 @media (max-width: 600px) { .hero::before { display: none; } }
@@ -82,8 +124,8 @@ h3 {
 @media (max-width: 600px) { .hero .container { padding-left: 1.5rem; } }
 
 .charter-line {
-  color: #8b949e;
-  font-family: Georgia, "Times New Roman", serif;
+  color: var(--grey-2);
+  font-family: var(--font-display);
   font-style: italic;
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
@@ -98,30 +140,31 @@ nav {
   padding: 1rem 1.5rem;
   max-width: 1024px;
   margin: 0 auto;
-  border-bottom: 1px solid #161b22;
+  border-bottom: 1px solid var(--line);
 }
 nav .brand {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  font-family: Georgia, "Times New Roman", serif;
-  color: #8b949e;
+  font-family: var(--font-display);
+  color: var(--grey-2);
   font-size: 0.9rem;
   letter-spacing: 0.05em;
 }
 nav .brand svg { opacity: 0.7; }
 nav a {
-  color: #79c0ff;
+  color: var(--violet-bright);
   text-decoration: none;
   font-size: 0.85rem;
+  padding: 0.35rem 0;
   transition: color 0.15s;
 }
-nav a:hover { color: #7ee787; }
+nav a:hover { color: var(--cyan); }
 nav .nav-links { display: flex; gap: 1.5rem; }
 
 /* ── Sections ── */
 section { padding: 4rem 0; }
-section + section { border-top: 1px solid #161b22; }
+section + section { border-top: 1px solid var(--line); }
 
 .feature-grid {
   display: grid;
@@ -131,17 +174,17 @@ section + section { border-top: 1px solid #161b22; }
 @media (max-width: 700px) { .feature-grid { grid-template-columns: 1fr; } }
 
 .feature-card {
-  background: #0d1117;
-  border: 1px solid #21262d;
+  background: var(--ink-3);
+  border: 1px solid var(--line);
   border-radius: 8px;
   padding: 1.5rem;
   transition: border-color 0.2s;
 }
-.feature-card:hover { border-color: #30363d; }
+.feature-card:hover { border-color: var(--line-2); }
 
 .theater-block {
-  font-family: Georgia, "Times New Roman", serif;
-  color: #c9d1d9;
+  font-family: var(--font-display);
+  color: var(--grey-3);
   line-height: 1.7;
   margin-bottom: 1rem;
   font-size: 0.95rem;
@@ -149,43 +192,51 @@ section + section { border-top: 1px solid #161b22; }
 }
 .theater-block strong {
   font-style: normal;
-  color: #f0f6fc;
+  color: var(--grey-4);
   font-weight: 500;
 }
 
 .receipt-block {
   font-size: 0.9rem;
-  color: #8b949e;
+  color: var(--grey-2);
   line-height: 1.6;
-  border-left: 2px solid #30363d;
+  border-left: 2px solid var(--line-2);
   padding-left: 1rem;
   margin-top: 1rem;
 }
-.receipt-block strong { color: #e6edf3; font-weight: 500; }
+.receipt-block strong { color: var(--grey-4); font-weight: 500; }
 
 /* ── Competence anchor ── */
 .competence {
-  background: #0d1117;
-  border: 1px solid #30363d;
+  background: var(--ink-3);
+  border: 1px solid var(--line-2);
   border-radius: 8px;
   padding: 2rem;
   margin-top: 2rem;
 }
 .competence h2 {
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-body);
   font-size: 1.3rem;
   font-weight: 500;
   margin-bottom: 1.5rem;
 }
-.competence h2 span { color: #7ee787; }
+.competence h2 span { color: var(--cyan); }
 .diagram-box {
-  background: #161b22;
+  background: var(--ink-2);
   border-radius: 6px;
   padding: 1.5rem;
   margin: 1rem 0;
   overflow-x: auto;
 }
 .diagram-box svg { max-width: 100%; height: auto; display: block; }
+.diagram-box figcaption {
+  margin-top: 0.8rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--grey-2);
+}
 .data-cols {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -196,35 +247,35 @@ section + section { border-top: 1px solid #161b22; }
 .data-cols ul {
   list-style: none;
   font-size: 0.88rem;
-  color: #8b949e;
+  color: var(--grey-2);
   line-height: 1.7;
 }
 .data-cols ul li::before {
   content: "→ ";
-  color: #7ee787;
+  color: var(--cyan);
 }
-.data-cols ul li strong { color: #e6edf3; font-weight: 500; }
+.data-cols ul li strong { color: var(--grey-4); font-weight: 500; }
 
 .wink {
   margin-top: 1.5rem;
   padding: 1rem;
-  border-top: 1px solid #21262d;
+  border-top: 1px solid var(--line);
   font-size: 0.8rem;
-  color: #6e7681;
+  color: var(--grey-1);
   font-style: italic;
 }
 
 /* ── Footer ── */
 footer {
-  border-top: 1px solid #21262d;
+  border-top: 1px solid var(--line);
   padding: 3rem 0;
   text-align: center;
-  color: #6e7681;
+  color: var(--grey-1);
   font-size: 0.85rem;
   line-height: 2;
 }
-footer a { color: #79c0ff; text-decoration: none; }
-footer a:hover { color: #7ee787; }
+footer a { color: var(--violet-bright); text-decoration: none; }
+footer a:hover { color: var(--cyan); }
 .seal-footer svg { opacity: 0.3; margin-bottom: 0.5rem; }
 
 /* ── Status badge ── */
@@ -232,18 +283,49 @@ footer a:hover { color: #7ee787; }
   display: inline-block;
   padding: 0.2rem 0.7rem;
   font-size: 0.75rem;
-  font-family: "SF Mono", monospace;
+  font-family: var(--font-body);
   border-radius: 12px;
-  border: 1px solid #58a6ff;
-  color: #58a6ff;
+  border: 1px solid var(--violet);
+  color: var(--violet);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 1rem;
 }
 
 /* ── Links ── */
-a { color: #79c0ff; text-decoration: none; }
-a:hover { color: #7ee787; }
+a { color: var(--violet-bright); text-decoration: none; }
+a:hover { color: var(--cyan); }
+a:visited { color: var(--violet); }
+
+/* ── Keyboard focus (WCAG 2.4.7, 3:1 vs adjacent) ── */
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── Skip link (WCAG 2.4.1) ── */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 10px 14px;
+  background: var(--violet-bright);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  border-bottom-right-radius: 4px;
+}
+.skip-link:focus-visible { left: 0; }
+
+/* ── No motion (WCAG 2.3.3) ── */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
 
 /* ── Responsive ── */
 @media (max-width: 600px) {
@@ -255,12 +337,15 @@ a:hover { color: #7ee787; }
 </head>
 <body>
 
-<nav>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header>
+<nav aria-label="Primary">
   <div class="brand">
     <svg width="24" height="28" viewBox="0 0 100 120" aria-hidden="true">
-      <path d="M50 5 L90 25 L90 70 Q90 100 50 115 Q10 100 10 70 L10 25 Z" fill="none" stroke="#8b949e" stroke-width="3"/>
-      <path d="M35 50 L50 35 L65 50 L50 65 Z" fill="none" stroke="#8b949e" stroke-width="2"/>
-      <path d="M20 30 Q50 40 80 30" fill="none" stroke="#8b949e" stroke-width="1.5" opacity="0.6"/>
+      <path d="M50 5 L90 25 L90 70 Q90 100 50 115 Q10 100 10 70 L10 25 Z" fill="none" stroke="#8B8B95" stroke-width="3"/>
+      <path d="M35 50 L50 35 L65 50 L50 65 Z" fill="none" stroke="#8B8B95" stroke-width="2"/>
+      <path d="M20 30 Q50 40 80 30" fill="none" stroke="#8B8B95" stroke-width="1.5" opacity="0.6"/>
     </svg>
     <span>House of Hydra</span>
   </div>
@@ -269,6 +354,9 @@ a:hover { color: #7ee787; }
     <a href="#receipts">Systems →</a>
   </div>
 </nav>
+</header>
+
+<main id="main">
 
 <!-- ═════════════════════════ HERO ═════════════════════════ -->
 <section class="hero" id="charter">
@@ -290,14 +378,14 @@ a:hover { color: #7ee787; }
   <div class="container">
     <div class="feature-grid">
       <div class="feature-card">
-        <h3>A correction that understands intent</h3>
+        <h2>A correction that understands intent</h2>
         <div class="theater-block">
           <p>
             The Typographical Council (est. 1669) has, after due deliberation spanning
             three hundred fifty-seven years and an equal number of sprint retrospectives
             that could have been emails, determined that the prevailing method of
-            autocorrection — ranking candidates by <strong>Levenshtein edit distance</strong>
-            — is architecturally unsound. One does not correct a telegram by counting the
+            autocorrection (ranking candidates by <strong>Levenshtein edit distance</strong>)
+            is architecturally unsound. One does not correct a telegram by counting the
             mis-stamped letters. One reads the <em>message</em>.
           </p>
           <p style="margin-top:0.8rem">
@@ -310,17 +398,17 @@ a:hover { color: #7ee787; }
           <strong>What that means in practice:</strong> hydratype feeds your full sentence context
           into Apple's on-device Foundation Models LLM (~3B parameters, iOS/macOS 26)
           through a <code class="mono">@Generable</code> &ldquo;did-you-mean&rdquo; schema. The model returns a
-          primary correction plus ranked alternates. It preserves intent and tone —
+          primary correction plus ranked alternates. It preserves intent and tone,
           keeping your slang and profanity when deliberate, because a keyboard that
-          sanitizes your voice isn't smart, it's a compliance department with a keycaps.
+          sanitizes your voice isn't smart; it's a compliance department with keycaps.
         </div>
       </div>
 
       <div class="feature-card">
-        <h3>On-device &amp; private by construction</h3>
+        <h2>On-device &amp; private by construction</h2>
         <div class="theater-block">
           <p>
-            Article IV, §3 — <strong>No Key Shall Be Stored on Disk, for That Is the Path
+            Article IV, §3: <strong>No Key Shall Be Stored on Disk, for That Is the Path
             of the Unwise.</strong> The Council has further decreed that the keyboard shall make
             no network call, for the network is the vector of surveillance capitalism,
             and the House of Hydra does not rent its ledgers to advertisers.
@@ -333,7 +421,7 @@ a:hover { color: #7ee787; }
         </div>
         <div class="receipt-block">
           <strong>How it works:</strong> The keyboard extension does <strong>zero networking</strong>.
-          Correction inference runs via Apple Foundation Models — either in-process or
+          Correction inference runs via Apple Foundation Models, either in-process or
           brokered through the host app over a shared App Group (we're validating the
           exact mechanism empirically; the memory ceiling on extensions is real, and we
           name it rather than paper over it). BYO endpoint keys live in the Keychain,
@@ -349,16 +437,16 @@ a:hover { color: #7ee787; }
   <div class="container">
     <div class="feature-grid">
       <div class="feature-card">
-        <h3>Honest telemetry (we publish the methodology)</h3>
+        <h2>Honest telemetry (we publish the methodology)</h2>
         <div class="theater-block">
           <p>
             The House publishes its ledgers. Every quarter, the Archivist releases a
             bound volume of aggregate correction statistics, the noise calibration
-            methodology having been independently reviewed by the public — which is to
+            methodology having been independently reviewed by the public, which is to
             say, by the same open-source community that can read the code.
           </p>
           <p style="margin-top:0.8rem">
-            Article IV, §5 — <strong>"A claim that cannot be falsified is not a claim; it is
+            Article IV, §5: <strong>"A claim that cannot be falsified is not a claim; it is
             marketing."</strong> The Council abhors marketing.
           </p>
         </div>
@@ -367,16 +455,16 @@ a:hover { color: #7ee787; }
           Your device computes local summary deltas, adds calibrated noise <em>before</em>
           anything is transmitted. Only the host app (never the keyboard) uploads noised
           summaries. Three cohorts: <code class="mono">baseline</code> / <code class="mono">local_afm</code> / <code class="mono">cloud_assisted</code>.
-          The rollup layer is <strong>open-sourced</strong>. Raw keystrokes never leave your device —
+          The rollup layer is <strong>open-sourced</strong>. Raw keystrokes never leave your device,
           not because of a promise, but because the code literally has no path to send them.
         </div>
       </div>
 
       <div class="feature-card">
-        <h3>Three tiers (one of which requires no money)</h3>
+        <h2>Three tiers (one of which requires no money)</h2>
         <div class="theater-block">
           <p>
-            Article IV, §7 — <strong>On the Matter of Tiers.</strong> The Council, in its wisdom,
+            Article IV, §7: <strong>On the Matter of Tiers.</strong> The Council, in its wisdom,
             has established three estates:
           </p>
           <p style="margin-top:0.5rem">
@@ -385,14 +473,14 @@ a:hover { color: #7ee787; }
           </p>
           <p style="margin-top:0.5rem">
             <strong>The Gentry</strong> pays a one-time tithe of one dollar or more
-            (a tip, really — the Council is not a tax authority) and receives the keys to their
+            (a tip, really; the Council is not a tax authority) and receives the keys to their
             own infrastructure: bring your own OpenAI-compatible endpoint, your own R2 bucket,
             your own D1 database. Your keys live in the Keychain. We never touch them.
           </p>
           <p style="margin-top:0.5rem">
             <strong>The Nobility</strong> pays five dollars monthly and receives a personalized
-            LoRA adapter fine-tuned to their own typing patterns — delivered via Background Assets,
-            compatibility-guarded against base-model bumps — subject to a <strong>hard usage cap</strong>,
+            LoRA adapter fine-tuned to their own typing patterns (delivered via Background Assets,
+            compatibility-guarded against base-model bumps), subject to a <strong>hard usage cap</strong>,
             because surprise billing is a form of violence and the Council does not permit violence
             against subscribers.
           </p>
@@ -400,7 +488,7 @@ a:hover { color: #7ee787; }
         <div class="receipt-block">
           <strong>Pricing sanity:</strong> <strong>Free</strong> (local AFM). <strong>Tip-unlock BYO</strong> ($1+ one-time).
           <strong>Managed cloud</strong> ($5/mo, hard-capped fallback to local-only). The BYO path has
-          zero dependency on third-party betas — it ships even if the managed cloud infra is gated.
+          zero dependency on third-party betas; it ships even if the managed cloud infra is gated.
         </div>
       </div>
     </div>
@@ -412,7 +500,7 @@ a:hover { color: #7ee787; }
   <div class="container">
     <div class="feature-grid">
       <div class="feature-card">
-        <h3>Layouts that bend to your hand</h3>
+        <h2>Layouts that bend to your hand</h2>
         <div class="theater-block">
           <p>
             The Council recognizes that not all hands are two, and that not all
@@ -421,7 +509,7 @@ a:hover { color: #7ee787; }
             had it since 2019 and it's fine, actually.
           </p>
           <p style="margin-top:0.8rem">
-            Article IV, §11 — <strong>On the Diversity of Keyboards</strong> — establishes that
+            Article IV, §11 (On the Diversity of Keyboards) establishes that
             the keymap is <em>data, not dogma</em>. Half-qwerty, T9-style compact grids,
             ortholinear, Colemak-DH: these are configurations over one engine, not
             separate apps. Each is designed to be usable one-handed, because a keyboard
@@ -438,16 +526,16 @@ a:hover { color: #7ee787; }
       </div>
 
       <div class="feature-card">
-        <h3>Accessibility as a requirement, not an afterthought</h3>
+        <h2>Accessibility as a requirement, not an afterthought</h2>
         <div class="theater-block">
           <p>
             The ancient texts are printed in large type for a reason: clarity is not a
             luxury. The Council has decreed that the keyboard shall be usable by the
             one-handed, the low-vision, and those whose motor control is having a bad
-            day — which is to say, <em>everyone eventually</em>.
+            day, which is to say, <em>everyone eventually</em>.
           </p>
           <p style="margin-top:0.8rem">
-            Article IV, §13 — <strong>"That which is accessible to the few is better for the
+            Article IV, §13: <strong>"That which is accessible to the few is better for the
             many."</strong> The same meaning-first correction engine that forgives a fat-fingered
             tap also recovers intent from imprecise input caused by tremor, low vision,
             or typing on a moving train. This is not altruism. It is good engineering.
@@ -464,7 +552,7 @@ a:hover { color: #7ee787; }
 
     <div class="feature-grid" style="margin-top:2rem">
       <div class="feature-card">
-        <h3>Prediction that respects your rhythm</h3>
+        <h2>Prediction that respects your rhythm</h2>
         <div class="theater-block">
           <p>
             The Oracle foretells your next word. Unlike oracles of old, however,
@@ -473,11 +561,11 @@ a:hover { color: #7ee787; }
             was very clear on this point.)
           </p>
           <p style="margin-top:0.8rem">
-            Article IV, §15 — <strong>"Prediction shall be fast to accept and just as fast
+            Article IV, §15: <strong>"Prediction shall be fast to accept and just as fast
             to undo."</strong> A tap accepts the next word. A double-tap accepts the whole
             predicted phrase. A swipe right-to-left undoes the last correction.
             The punctuation toggle offers three modes: none, learned (it won't
-            "fix" <em>lol</em> into <em>LOL</em> — it knows how you actually write),
+            "fix" <em>lol</em> into <em>LOL</em>; it knows how you actually write),
             and proper. Scrub-delete lets you swipe backward to delete whole words,
             with a forward un-delete to recover what you overshot.
           </p>
@@ -492,7 +580,7 @@ a:hover { color: #7ee787; }
 
       <!-- Empty card for symmetry (single card in bottom row) -->
       <div class="feature-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;border-style:dashed">
-        <div style="text-align:center;color:#6e7681">
+        <div style="text-align:center;color:var(--grey-1)">
           <div style="font-family:Georgia,serif;font-size:2.5rem;opacity:0.4;margin-bottom:0.5rem">¶</div>
           <p style="font-size:0.85rem;max-width:20em">
             More articles of the Charter are being drafted. The Council is slow, but it
@@ -508,80 +596,84 @@ a:hover { color: #7ee787; }
 <section id="receipts">
   <div class="container">
     <div class="competence">
-      <h2><span>⧩</span> Technical receipts <span style="font-weight:400;color:#8b949e;font-size:0.85rem">(no theater)</span></h2>
+      <h2><span aria-hidden="true">⧩</span> Technical receipts <span style="font-weight:400;color:var(--grey-2);font-size:0.85rem">(no theater)</span></h2>
 
-      <p style="color:#8b949e;font-size:0.9rem;margin-bottom:1.5rem">
+      <p style="color:var(--grey-2);font-size:0.9rem;margin-bottom:1.5rem">
         This section is deliberately free of personae. If you are a technical decision-maker
         who does not have time for the Charter, start here. The following is what actually
         runs on device.
       </p>
 
-      <h3 style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:1rem;font-weight:500;margin-bottom:0.5rem">System architecture</h3>
+      <h3 style="font-family:var(--font-body);font-size:1rem;font-weight:500;margin-bottom:0.5rem">System architecture</h3>
       <div class="diagram-box">
-<svg viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,BlinkMacSystemFont,sans-serif">
+<figure>
+<svg viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Architecture diagram: the keyboard extension communicates with the host app over a shared App Group; the host app brokers Apple Foundation Models and reads BYO keys from the Keychain; the cloud side receives opt-in noised aggregate telemetry via Cloudflare R2 to Queue to D1." font-family="JetBrains Mono, ui-monospace, SF Mono, Menlo, monospace">
+  <title>hydratype system architecture</title>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#58a6ff"/>
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#A855F7"/>
     </marker>
   </defs>
 
   <!-- Device box -->
-  <rect x="10" y="10" width="580" height="120" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
-  <text x="25" y="35" fill="#8b949e" font-size="11" font-weight="500">YOUR DEVICE (iOS / macOS 26)</text>
+  <rect x="10" y="10" width="580" height="120" rx="8" fill="#111114" stroke="#26262C" stroke-width="1"/>
+  <text x="25" y="35" fill="#8B8B95" font-size="11" font-weight="500">YOUR DEVICE (iOS / macOS 26)</text>
 
   <!-- Extension -->
-  <rect x="30" y="50" width="140" height="60" rx="6" fill="#0d1117" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="100" y="75" text-anchor="middle" fill="#e6edf3" font-size="11" font-weight="500">Keyboard Ext.</text>
-  <text x="100" y="92" text-anchor="middle" fill="#8b949e" font-size="9">~50-60 MB ceiling</text>
-  <text x="100" y="105" text-anchor="middle" fill="#8b949e" font-size="9">ModeEngine · Store</text>
+  <rect x="30" y="50" width="140" height="60" rx="6" fill="#17171B" stroke="#A855F7" stroke-width="1.5"/>
+  <text x="100" y="75" text-anchor="middle" fill="#E8E8EA" font-size="11" font-weight="500">Keyboard Ext.</text>
+  <text x="100" y="92" text-anchor="middle" fill="#8B8B95" font-size="9">~50-60 MB ceiling</text>
+  <text x="100" y="105" text-anchor="middle" fill="#8B8B95" font-size="9">ModeEngine · Store</text>
 
   <!-- Arrow -->
-  <line x1="170" y1="80" x2="210" y2="80" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="170" y1="80" x2="210" y2="80" stroke="#A855F7" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- App Group -->
-  <rect x="210" y="55" width="50" height="50" rx="25" fill="#1c2128" stroke="#30363d" stroke-width="1" stroke-dasharray="3,2"/>
-  <text x="235" y="80" text-anchor="middle" fill="#8b949e" font-size="8">App</text>
-  <text x="235" y="92" text-anchor="middle" fill="#8b949e" font-size="8">Group</text>
+  <rect x="210" y="55" width="50" height="50" rx="25" fill="#17171B" stroke="#26262C" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="235" y="80" text-anchor="middle" fill="#8B8B95" font-size="8">App</text>
+  <text x="235" y="92" text-anchor="middle" fill="#8B8B95" font-size="8">Group</text>
 
   <!-- Arrow -->
-  <line x1="260" y1="80" x2="300" y2="80" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="260" y1="80" x2="300" y2="80" stroke="#A855F7" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- Host app -->
-  <rect x="300" y="50" width="150" height="60" rx="6" fill="#0d1117" stroke="#7ee787" stroke-width="1.5"/>
-  <text x="375" y="75" text-anchor="middle" fill="#e6edf3" font-size="11" font-weight="500">Host App</text>
-  <text x="375" y="92" text-anchor="middle" fill="#8b949e" font-size="9">AFM broker (if needed)</text>
-  <text x="375" y="105" text-anchor="middle" fill="#8b949e" font-size="9">Dashboard · Telemetry</text>
+  <rect x="300" y="50" width="150" height="60" rx="6" fill="#17171B" stroke="#22D3EE" stroke-width="1.5"/>
+  <text x="375" y="75" text-anchor="middle" fill="#E8E8EA" font-size="11" font-weight="500">Host App</text>
+  <text x="375" y="92" text-anchor="middle" fill="#8B8B95" font-size="9">AFM broker (if needed)</text>
+  <text x="375" y="105" text-anchor="middle" fill="#8B8B95" font-size="9">Dashboard · Telemetry</text>
 
   <!-- Down arrow to AFM -->
-  <line x1="375" y1="110" x2="375" y2="145" stroke="#7ee787" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="375" y1="110" x2="375" y2="145" stroke="#22D3EE" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- AFM box -->
-  <rect x="30" y="150" width="250" height="60" rx="6" fill="#0d1117" stroke="#d2a8ff" stroke-width="1.5"/>
-  <text x="155" y="175" text-anchor="middle" fill="#e6edf3" font-size="11" font-weight="500">Foundation Models AFM</text>
-  <text x="155" y="192" text-anchor="middle" fill="#8b949e" font-size="9">~3B on-device LLM · @Generable</text>
+  <rect x="30" y="150" width="250" height="60" rx="6" fill="#17171B" stroke="#C084FC" stroke-width="1.5"/>
+  <text x="155" y="175" text-anchor="middle" fill="#E8E8EA" font-size="11" font-weight="500">Foundation Models AFM</text>
+  <text x="155" y="192" text-anchor="middle" fill="#8B8B95" font-size="9">~3B on-device LLM · @Generable</text>
 
   <!-- Keychain box -->
-  <rect x="320" y="150" width="120" height="60" rx="6" fill="#0d1117" stroke="#f0883e" stroke-width="1.5" stroke-dasharray="4,2"/>
-  <text x="380" y="175" text-anchor="middle" fill="#e6edf3" font-size="11" font-weight="500">Keychain</text>
-  <text x="380" y="192" text-anchor="middle" fill="#8b949e" font-size="9">BYO keys only</text>
+  <rect x="320" y="150" width="120" height="60" rx="6" fill="#17171B" stroke="#F5A524" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="380" y="175" text-anchor="middle" fill="#E8E8EA" font-size="11" font-weight="500">Keychain</text>
+  <text x="380" y="192" text-anchor="middle" fill="#8B8B95" font-size="9">BYO keys only</text>
 
   <!-- Keychain reads at call time -->
-  <line x1="320" y1="180" x2="280" y2="180" stroke="#f0883e" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrow)"/>
+  <line x1="320" y1="180" x2="280" y2="180" stroke="#F5A524" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrow)"/>
 
   <!-- Cloud side -->
-  <rect x="460" y="150" width="120" height="60" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
-  <text x="520" y="175" text-anchor="middle" fill="#8b949e" font-size="10">☁️ Cloudflare</text>
-  <text x="520" y="192" text-anchor="middle" fill="#6e7681" font-size="9">R2 → Queue → D1</text>
+  <rect x="460" y="150" width="120" height="60" rx="6" fill="#111114" stroke="#26262C" stroke-width="1"/>
+  <text x="520" y="175" text-anchor="middle" fill="#8B8B95" font-size="10">☁️ Cloudflare</text>
+  <text x="520" y="192" text-anchor="middle" fill="#7C7C85" font-size="9">R2 → Queue → D1</text>
 
-  <line x1="420" y1="80" x2="460" y2="170" stroke="#30363d" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrow)"/>
-  <text x="440" y="130" text-anchor="middle" fill="#6e7681" font-size="8">opt-in noised</text>
-  <text x="440" y="140" text-anchor="middle" fill="#6e7681" font-size="8">aggregates only</text>
+  <line x1="420" y1="80" x2="460" y2="170" stroke="#26262C" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrow)"/>
+  <text x="440" y="130" text-anchor="middle" fill="#7C7C85" font-size="8">opt-in noised</text>
+  <text x="440" y="140" text-anchor="middle" fill="#7C7C85" font-size="8">aggregates only</text>
 </svg>
+<figcaption>System architecture</figcaption>
+</figure>
       </div>
 
       <div class="data-cols">
         <div>
-          <h4 style="font-size:0.9rem;font-weight:500;margin-bottom:0.5rem;color:#e6edf3">Key invariants</h4>
+          <h4 style="font-size:0.9rem;font-weight:500;margin-bottom:0.5rem;color:var(--grey-4)">Key invariants</h4>
           <ul>
             <li><strong>Zero networking</strong> from the keyboard extension itself</li>
             <li><strong>Zero Local Secrets:</strong> BYO keys in Keychain, fetched at call time, never on disk</li>
@@ -592,10 +684,10 @@ a:hover { color: #7ee787; }
           </ul>
         </div>
         <div>
-          <h4 style="font-size:0.9rem;font-weight:500;margin-bottom:0.5rem;color:#e6edf3">Privacy model</h4>
+          <h4 style="font-size:0.9rem;font-weight:500;margin-bottom:0.5rem;color:var(--grey-4)">Privacy model</h4>
           <ul>
-            <li><strong>Opt-in only</strong> aggregate telemetry — default is off</li>
-            <li><strong>Differential privacy</strong> noise added on-device before any transmit</li>
+            <li><strong>Opt-in only</strong> aggregate telemetry; default is off</li>
+            <li><strong>Differential privacy</strong> noise added on-device before any transmission</li>
             <li><strong>No identity linkage:</strong> no accounts, no device IDs, no per-event rows</li>
             <li><strong>Three cohorts:</strong> baseline, local_afm, cloud_assisted</li>
             <li><strong>Open-source rollup:</strong> methodology published alongside numbers</li>
@@ -604,15 +696,15 @@ a:hover { color: #7ee787; }
         </div>
       </div>
 
-      <p style="font-size:0.85rem;color:#8b949e;margin-top:1rem">
+      <p style="font-size:0.85rem;color:var(--grey-2);margin-top:1rem">
         <strong>Status:</strong> Greenfield. Core correction engine, correction store, mode engine,
         App Group smoke test, and macOS CLI test rig are built and passing.
         <strong>E-SPIKE-1</strong> (empirical AFM-in-extension test) is pending hardware validation.
-        The keyboard extension is a minimal 4-button proof — full layout and correction
+        The keyboard extension is a minimal 4-button proof; full layout and correction
         wiring are gated behind that spike's verdict. <a href="https://github.com/mockingb1rdblue/hydratype">Source on GitHub →</a>
       </p>
 
-      <p style="font-size:0.85rem;color:#8b949e;margin-top:0.5rem">
+      <p style="font-size:0.85rem;color:var(--grey-2);margin-top:0.5rem">
         <a href="https://github.com/mockingb1rdblue/hydratype">Source on GitHub</a> ·
         <a href="https://github.com/mockingb1rdblue/hydratype/tree/hee-haw/docs">Documentation</a>
       </p>
@@ -620,7 +712,7 @@ a:hover { color: #7ee787; }
       <div class="wink">
         † This page is served by a Cloudflare Worker. Its access logs are routed to a
         distributed tracing pipeline called <strong>Sluagh Swarm</strong>, which is Scots Gaelic
-        for &ldquo;host of the dead&rdquo; — and is, we assure you, a perfectly normal piece of
+        for &ldquo;host of the dead&rdquo;, and is, we assure you, a perfectly normal piece of
         infrastructure monitoring software. We do not name these systems. The systems name
         themselves. We just deploy here.
       </div>
@@ -628,21 +720,23 @@ a:hover { color: #7ee787; }
   </div>
 </section>
 
+</main>
+
 <!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
 <footer>
   <div class="container">
     <div class="seal-footer">
-      <svg width="36" height="44" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-        <path d="M50 5 L90 25 L90 70 Q90 100 50 115 Q10 100 10 70 L10 25 Z" fill="none" stroke="#6e7681" stroke-width="2"/>
-        <path d="M35 50 L50 35 L65 50 L50 65 Z" fill="none" stroke="#6e7681" stroke-width="1.5"/>
-        <path d="M20 30 Q50 40 80 30" fill="none" stroke="#6e7681" stroke-width="1" opacity="0.5"/>
-        <text x="50" y="90" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#6e7681">1669</text>
+      <svg width="36" height="44" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M50 5 L90 25 L90 70 Q90 100 50 115 Q10 100 10 70 L10 25 Z" fill="none" stroke="#7C7C85" stroke-width="2"/>
+        <path d="M35 50 L50 35 L65 50 L50 65 Z" fill="none" stroke="#7C7C85" stroke-width="1.5"/>
+        <path d="M20 30 Q50 40 80 30" fill="none" stroke="#7C7C85" stroke-width="1" opacity="0.5"/>
+        <text x="50" y="90" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#7C7C85">1669</text>
       </svg>
     </div>
     <p><strong>House of Hydra</strong> &middot; Charter of 1669 &middot; Amended 2026</p>
     <p>hydratype is <strong>not yet on the App Store</strong>. It is greenfield, in active development, and honest about what that means.</p>
-    <p>Built to the <a href="https://github.com/mockingb1rdblue">Bifrost Northstar</a> — Zero Local Secrets, loud-by-default failure handling, honest measurement.</p>
-    <p style="margin-top:1rem;font-size:0.75rem;color:#484f58">
+    <p>Built to the <a href="https://github.com/mockingb1rdblue">Bifrost Northstar</a>: Zero Local Secrets, loud-by-default failure handling, honest measurement.</p>
+    <p style="margin-top:1rem;font-size:0.75rem;color:var(--grey-1)">
       The Council does not track you. The Council does not sell your data. The Council does not know what &ldquo;engagement optimization&rdquo; means,
       and it has voted not to learn. &ldquo;1669&rdquo; is a bit. The rest is real.
     </p>
