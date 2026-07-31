@@ -766,7 +766,7 @@ a:visited { color: var(--violet); }
     </div>
     <p><strong>House of Hydra</strong> &middot; Charter of 1669 &middot; Amended 2026</p>
     <p>hydratype is <strong>not yet on the App Store</strong>. It is greenfield, in active development, and honest about what that means.</p>
-    <p>Built to the <a href="https://deck.mock1ngbb.com/hydrav11/northstar">Bifrost Northstar</a>: Zero Local Secrets, loud-by-default failure handling, honest measurement.</p>
+    <p>Built to the <a href="https://deck.mock1ngbb.com/hydrav11/erebus-compact">Erebus Compact</a>: Zero Local Secrets, loud-by-default failure handling, honest measurement.</p>
     <p style="margin-top:1rem;font-size:0.75rem;color:var(--grey-1)">
       The Council does not track you. The Council does not sell your data. The Council does not know what &ldquo;engagement optimization&rdquo; means,
       and it has voted not to learn. &ldquo;1669&rdquo; is a bit. The rest is real.
@@ -780,17 +780,17 @@ a:visited { color: var(--violet); }
 
 
 
-const NORTHSTAR = `<!DOCTYPE html>
+const EREBUS_COMPACT = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bifrost Northstar: the operating axioms</title>
-<meta name="description" content="What the Bifrost Northstar is: the engineering and operating principles this project is built to, enforced mechanically rather than by memory.">
-<meta property="og:title" content="Bifrost Northstar: the operating axioms">
+<title>The Erebus Compact: the constitution of the House of Hydra</title>
+<meta name="description" content="The Erebus Compact: the dark-mythology constitution of the House of Hydra. Nine Articles of the Compact and the antipatterns the Council forbids.">
+<meta property="og:title" content="The Erebus Compact">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://deck.mock1ngbb.com/hydrav11/northstar">
-<link rel="canonical" href="https://deck.mock1ngbb.com/hydrav11/northstar">
+<meta property="og:url" content="https://deck.mock1ngbb.com/hydrav11/erebus-compact">
+<link rel="canonical" href="https://deck.mock1ngbb.com/hydrav11/erebus-compact">
 <meta name="robots" content="index, follow">
 <style>
 /* EREBUS dark theme (rift-runes) · WCAG AA · shared token palette */
@@ -846,8 +846,13 @@ h1 {
   margin-bottom: 1.25rem; text-wrap: balance;
 }
 h1 em { font-style: italic; color: var(--violet-bright); }
-.intro {
-  color: var(--grey-3); max-width: var(--measure); margin-bottom: 3rem; font-size: 1.05rem;
+.creed {
+  color: var(--grey-3); font-family: var(--font-display); font-style: italic;
+  font-size: 1.15rem; max-width: var(--measure); margin-bottom: 2rem;
+}
+.section-label {
+  font-family: var(--font-body); font-size: 12px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--grey-2); margin: 3rem 0 1rem;
 }
 ol.axioms { list-style: none; padding: 0; max-width: var(--measure); counter-reset: axiom; }
 ol.axioms li {
@@ -866,7 +871,24 @@ ol.axioms h2 {
   font-size: 1.05rem; letter-spacing: 0.02em; margin-bottom: 0.4rem;
 }
 ol.axioms p { color: var(--grey-2); font-size: 0.92rem; }
-ol.axioms code {
+ol.forbidden { list-style: none; padding: 0; max-width: var(--measure); counter-reset: forbid; }
+ol.forbidden li {
+  position: relative; padding: 1.25rem 0 1.25rem 3.25rem;
+  border-top: 1px solid var(--line); counter-increment: forbid;
+}
+ol.forbidden li::before {
+  content: counter(forbid, decimal-leading-zero);
+  position: absolute; left: 0; top: 1.25rem;
+  font-family: var(--font-body); font-size: 12px; letter-spacing: 0.12em;
+  color: var(--rose);
+}
+ol.forbidden li:last-child { border-bottom: 1px solid var(--line); }
+ol.forbidden h2 {
+  font-family: var(--font-body); font-weight: 700; color: var(--rose);
+  font-size: 1.05rem; letter-spacing: 0.02em; margin-bottom: 0.4rem;
+}
+ol.forbidden p { color: var(--grey-2); font-size: 0.92rem; }
+ol.axioms code, ol.forbidden code {
   font-family: var(--font-body); font-size: 0.9em; color: var(--cyan);
   background: var(--ink-2); border: 1px solid var(--line-2);
   border-radius: 3px; padding: 0.1em 0.35em;
@@ -906,7 +928,7 @@ a:visited { color: var(--violet); }
       <path d="M35 50 L50 35 L65 50 L50 65 Z" fill="none" stroke="#8B8B95" stroke-width="2"/>
       <path d="M20 30 Q50 40 80 30" fill="none" stroke="#8B8B95" stroke-width="1.5" opacity="0.6"/>
     </svg>
-    <span>Bifrost Northstar</span>
+    <span>The Erebus Compact</span>
   </div>
   <div class="nav-links">
     <a href="/hydrav11">Back to hydratype</a>
@@ -916,57 +938,109 @@ a:visited { color: var(--violet); }
 
 <main id="main">
   <div class="container">
-    <div class="kicker">House of Hydra · operating principles</div>
-    <h1>Bifrost Northstar</h1>
-    <p class="intro">
-      The Bifrost Northstar is the set of engineering and operating axioms this project is built to.
-      They are enforced mechanically, by hooks and gates and tests, never by memory or by prose.
-      When a rule can be automated, it is automated. That is itself one of the rules.
+    <div class="kicker">House of Hydra · Article IV, as amended</div>
+    <h1>The Erebus Compact</h1>
+    <p class="creed">
+      Let every keystroke be judged in the dark, sanitize no voice, and rent no ledger to advertisers.
     </p>
 
+    <div class="section-label">Articles of the Compact</div>
     <ol class="axioms">
       <li>
-        <h2>Zero Local Secrets</h2>
-        <p>Credentials are fetched from a vault at runtime, never committed and never hardcoded. The codebase holds no keys; <code>bf</code> and the system Keychain do. A secret that is written down is a secret already lost.</p>
+        <h2>Article I: The Vault Is the Only Threshold</h2>
+        <p>No secret shall be written into the skin of the House. API keys are not artifacts; they are invocations, drawn from the Keychain at call time, held in memory for one breath, and never committed to disk, to a log, or to a pastebin of the mind. The keyboard shall not network; the host app alone may carry the Sluagh's offerings, and it shall carry no key that was not fetched from the vault that same turn.</p>
       </li>
       <li>
-        <h2>Loud by default</h2>
-        <p>Every error path emits a structured log line. No empty catches, no swallowed errors, no silent <code>return nil</code>. A path that cannot be validated end to end is marked a known deficiency, never shipped as if it were clean.</p>
+        <h2>Article II: The Sluagh Must Hear Every Cry</h2>
+        <p>Every error path shall raise a structured lament. There are no empty catches, no silent nil, no return that returns nothing to the Council. A gate that emits no event is a dead god; let it be torn down. The Sluagh Swarm traces the path of each failure, and it feeds only on truth.</p>
       </li>
       <li>
-        <h2>Honest measurement</h2>
-        <p>Numbers are published with their methodology, and raw inputs never quietly vanish. A claim that cannot be falsified is not a claim; it is marketing. The Council abhors marketing.</p>
+        <h2>Article III: No Number Worships Itself</h2>
+        <p>Any number reported to the Council is a public oath. It must say how it was measured, what cloud it rode, what seed it used, what differential noise the Sluagh applied, and what it does not claim. A claim that cannot be falsified is not a claim; it is marketing, and marketing is for the Gentry, not for the Commons. Publish the methodology or strike the number from the record.</p>
       </li>
       <li>
-        <h2>Commodity Intelligence</h2>
-        <p>No hardcoded model id. Models are a commodity, and the pipeline treats them as such. The code stays provider-agnostic so a better model can replace a worse one without a rewrite.</p>
+        <h2>Article IV: The Model Is a Ferryman, Not a King</h2>
+        <p>No model id shall be carved into the foundation. The intent-aware path shall be a guided generation with <code>@Generable</code>, not a clattering of n-grams and edit distances. The on-device Foundation Model is a commodity ferry across the river; it may be changed, swapped, or retired by the Council. Guided generation with <code>@Generable</code> is the script, and the script is owned by HydraCore, not by any vendor. A hardcoded model id is a crown on a dead man.</p>
       </li>
       <li>
-        <h2>Mechanize, not md</h2>
-        <p>A recurring behavioral gap is not fixed by writing a document about it. It is baked into a hook, a script, a gate, or a test. Documentation records where the mechanism lives; it does not do the work.</p>
+        <h2>Article V: The Gate Is a Golem</h2>
+        <p>Recurring rules shall be baked into hooks, scripts, gates, and tests, not into prose. If a rule can be mechanized, it shall be mechanized. If a human must remember it, it is a ghost, and ghosts are unreliable. Search before create: the Golem shall check the archive before any file, PR, or issue is born, and it shall refuse to birth a duplicate.</p>
       </li>
       <li>
-        <h2>Defer nothing</h2>
-        <p>Unblocked work is executed now. Truly blocked work is filed to the task store this turn, never left as a footnote in prose. A "later" is a red flag, not a resolution.</p>
+        <h2>Article VI: The Hour Is the Only Authority</h2>
+        <p>Unblocked work is executed now. Truly blocked work is filed to the task store this turn, with its blocker named and its oracle consulted. <code>Later</code> is a sloth; <code>out of scope</code> is a coward; <code>TODO</code> is a grave with no body. The Council does not defer what can be done today; it only files what cannot.</p>
       </li>
       <li>
-        <h2>Age is not a gate</h2>
-        <p>Work is not stale because it is old. A thing is merged or closed on its merits, never because of the date on it, and never asked "do you still want this?" as a reason to discard it.</p>
+        <h2>Article VII: Age Is the Shadow of Work, Not Its Judge</h2>
+        <p>A task is not stale because it has grown grey. Old work is merged or closed on its merits, not on its birthday. The Council shall not recycle a task that can never succeed; that is a zombie, and zombies feed on turns. If a task cannot succeed, drop it with a written epitaph.</p>
       </li>
       <li>
-        <h2>Plan is consent</h2>
-        <p>A plan plus a green light authorizes the whole scope: the waves, the parallelism, the cost, the duration. Re-confirming is forbidden; firing is the expectation.</p>
+        <h2>Article VIII: Consent Is a Written Flame</h2>
+        <p>A plan plus a green light authorizes the whole scope. If the plan is approved, no one shall ask again for each step; they shall execute. If a step lies outside the plan, it is a new plan and requires a new flame. Half-executed plans are better than endless deliberations, but only if the plan was honest.</p>
       </li>
       <li>
-        <h2>File it, then fix it</h2>
-        <p>Any warning, deprecation, retirement, or end-of-life that surfaces becomes a task with a canonical replacement and a migration, not a note-and-move-on. The point is to stop re-encountering the same dead endpoint every session.</p>
+        <h2>Article IX: The Ledger of Doom Is Kept in Ink</h2>
+        <p>Every deprecation, every warning, every shrug shall surface as a task with a canonical replacement and a migration. The Archivist shall ink it. The task store is the ledger of doom; what is not inked there is not real. File it, then fix it. If you cannot fix it, file it; if you will not file it, you are writing in water.</p>
+      </li>
+    </ol>
+
+    <div class="section-label">What the Council Forbids</div>
+    <ol class="forbidden">
+      <li>
+        <h2>The Duplicate Storm</h2>
+        <p>A rite that spawns the same file, PR, or issue without first consulting the archive. Every duplicate is a lie in the ledger, and the Sluagh wastes its breath tracing echoes.</p>
+      </li>
+      <li>
+        <h2>The Zombie Loop</h2>
+        <p>Recycling a task that can never succeed, bypassing the gates that should have closed it. A corpse cannot be revived by more turns; it must be buried with a written epitaph, not resurrected.</p>
+      </li>
+      <li>
+        <h2>The Eager Compiler</h2>
+        <p>Treating compilation as evidence of execution. A build that emits no events has told you nothing; silent code is a sleeping serpent. A gate that cannot fail is not a gate.</p>
+      </li>
+      <li>
+        <h2>The Silent Ledger</h2>
+        <p>Empty catches, silent nil, swallowed errors, silent NaN, silent token caps. The Sluagh cannot trace what the House refuses to say. Loud by default is the only default.</p>
+      </li>
+      <li>
+        <h2>The Mistaken Jurisdiction</h2>
+        <p>Conflating distinct compute or ownership boundaries: the keyboard's zero-network vow, the host app's upload path, the Cloudflare backend's telemetry, and the Keychain's vault are separate realms. A secret fetched for one realm may be a poison in another.</p>
+      </li>
+      <li>
+        <h2>The Rented Ledger</h2>
+        <p>Advertising any number as a metric without publishing its methodology. A hidden measure is a bribe, and the Commons deserves no bribes.</p>
+      </li>
+      <li>
+        <h2>The Carved Crown</h2>
+        <p>Hardcoding a model id, a secret string, a hostname, or any value that the Council did not bless and the vault does not hold. The model is a commodity and the key is a breath; neither may be chiseled in stone.</p>
+      </li>
+      <li>
+        <h2>The Vaulted Gossip</h2>
+        <p>Assuming a shared token or secret without verifying the callee's actual secret name and jurisdiction. A browser-facing worker holding a server secret is a cracked window. Trust is not a union of names; it is a match of exact keys.</p>
+      </li>
+      <li>
+        <h2>The Trusted Scroll</h2>
+        <p>Believing a JSDoc comment, a README, or a stale grep count without reading the callee source and the exact command. A comment is poetry, not a contract, and a stale count is a ghost in the ledger.</p>
+      </li>
+      <li>
+        <h2>The Re-Reaped Harvest</h2>
+        <p>Re-running an agent that ran out of turns instead of dispatching a targeted completion agent. A partial reaping does not feed the village; it only starves it slower.</p>
+      </li>
+      <li>
+        <h2>The Deferred Oath</h2>
+        <p>Resolving a task with <code>later</code>, <code>out of scope</code>, or <code>TODO</code> instead of doing the work or filing it. A note is not a deed, and the ledger of doom is not a scrapbook.</p>
+      </li>
+      <li>
+        <h2>The Chasing Shade</h2>
+        <p>Chasing a platform symptom such as HTTP 408 while the true failure grows downstream. The Sluagh feeds on the root cause, not the rustle at the gate.</p>
       </li>
     </ol>
 
     <p class="note">
-      These axioms live as enforceable mechanisms across the projects that subscribe to them. For the
-      project itself, see <a href="https://github.com/mock1ngbb/hydratype">hydratype</a> on GitHub.
-      Read the wider project from the top: <a href="/hydrav11">hydratype, Article IV</a>.
+      The Compact is the constitution of the House of Hydra. It is enforced mechanically, by hooks and
+      gates and tests, never by memory. Read the project from the top:
+      <a href="/hydrav11">hydratype, Article IV</a>, or the
+      <a href="https://github.com/mock1ngbb/hydratype">source</a>.
     </p>
   </div>
 </main>
@@ -992,8 +1066,8 @@ export default {
         }
       );
     }
-    if (url.pathname === '/hydrav11/northstar' || url.pathname === '/northstar') {
-      return new Response(NORTHSTAR, {
+    if (url.pathname === '/hydrav11/erebus-compact' || url.pathname === '/erebus-compact' || url.pathname === '/hydrav11/northstar' || url.pathname === '/northstar') {
+      return new Response(EREBUS_COMPACT, {
         status: 200,
         headers: {
           'content-type': 'text/html; charset=utf-8',
