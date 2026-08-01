@@ -1,11 +1,32 @@
 {
   "version": "1",
-  "owner": "mockingb1rdblue",
+  "owner": "mock1ngbb",
   "repo": "hydratype",
-  "platform_note": "iOS custom-keyboard extension (Swift + Apple Foundation Models). No Cloudflare-worker deploy target — build/sign/ship is via Xcode / TestFlight. charon-cicada owns intake/policy gating; no auto-deploy target until an Xcode-Cloud or fastlane target is wired.",
-  "targets": [],
+  "targets": [
+    {
+      "platform": "script",
+      "service_id": "script:hydratype-gate:production",
+      "build": {
+        "install_cmd": "true",
+        "build_cmd": "bash scripts/gate.sh"
+      },
+      "artifact": {
+        "type": "none"
+      },
+      "health_check": {
+        "url": "https://cicd-queue.mock1ng.workers.dev/v1/queue/status",
+        "timeout_seconds": 30,
+        "retry_count": 3,
+        "expected_status": 200
+      },
+      "rollback_strategy": "manual",
+      "watch_paths": ["**"],
+      "deploy_branch": "hee-haw",
+      "destructive_gate": false,
+      "max_deploy_time_seconds": 900,
+      "concurrent_deploys": "serial"
+    }
+  ],
   "secrets": [],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  "env": {}
 }

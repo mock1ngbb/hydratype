@@ -65,6 +65,25 @@ what will fire (the enforcement is not this markdown):
 - **Xcode project**: `.xcodeproj` is gitignored and generated from `project.yml`; the
   gitignore is the mechanism that prevents committing a hand-edited project.
 
+## CI/CD authority (delegated)
+
+CI/CD ordering, deploy webhook routing, and pipeline contract semantics defer to the canonical
+northstar in the bifrost-bridge constitution:
+
+- `bifrost-bridge/docs/constitutions/cicd/constitution.md` § Article I
+- `bifrost-bridge/docs/constitutions/cicd/contract-deploy-lifecycle.md`
+- `bifrost-bridge/docs/constitutions/cicd/contract-deploy-manifest.md`
+
+Live path: GitHub push/pull_request → **cicd-intake** worker (`cicada/policy` proof) → **merge-warden**
+auto-squash-merges CLEAN PRs with a green `cicada/policy`; **cicd-queue** runs ephemeral Sprite
+builds. hydratype is enrolled in crypt-core vault-keeper (script gate target `hydratype-gate`).
+
+- **Auto pick-up + merge**: merge-warden cron (`*/10`), watches `mock1ngbb/hydratype`.
+- **Manual fire + merge**: `bash scripts/cicada-deploy.sh` (enqueue+drain) or `POST /v1/run`
+  on merge-warden (`PROXY_API_KEY`), plus the in-session `CLAUDE_MERGE_APPROVE=<n>` carve-out.
+- **Do not** manually `gh pr merge` from agent context (blocked by `agent-self-merge-guard`).
+- **Do not** add `.github/workflows/*` — cicada policy forbids GitHub Actions.
+
 ## Constitution — The Erebus Compact
 
 The project's governing constitution. **Values first, then operational laws, then antipatterns.**
