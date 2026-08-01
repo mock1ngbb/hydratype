@@ -1,4 +1,5 @@
 // E1-S4 acceptance: append + read-back + markSynced round-trips against a temp DB.
+// E0-S1 / E0-S2 acceptance: App Group container availability, data-model tier validation.
 
 import Foundation
 import XCTest
@@ -52,6 +53,30 @@ final class CorrectionStoreTests: XCTestCase {
     func testMissingContainerIsLoud() {
         XCTAssertThrowsError(try CorrectionStore(appGroupID: "group.does.not.exist.hydratype.test")) { error in
             XCTAssertTrue(error is StoreError)
+        }
+    }
+
+    func testInferenceTierValidation() throws {
+        // Valid tiers (from DATA-MODEL.md cohort tags) should not throw
+        XCTAssertNoThrow(try CorrectionEvent.validate(inferenceTier: "baseline"))
+        XCTAssertNoThrow(try CorrectionEvent.validate(inferenceTier: "local_afm"))
+        XCTAssertNoThrow(try CorrectionEvent.validate(inferenceTier: "cloud_assisted"))
+
+        // Invalid tiers should throw StoreError.parse
+        XCTAssertThrowsError(try CorrectionEvent.validate(inferenceTier: "invalid_tier")) { error in
+            guard case StoreError.parse(let msg) = error else {
+                XCTFail("expected StoreError.parse, got \(error)")
+                return
+            }
+            XCTAssertTrue(msg.contains("invalid_tier"))
+        }
+
+        // Empty string should throw
+        XCTAssertThrowsError(try CorrectionEvent.validate(inferenceTier: "")) { error in
+            guard case StoreError.parse = error else {
+                XCTFail("expected StoreError.parse for empty tier")
+                return
+            }
         }
     }
 }

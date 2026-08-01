@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Erebus Compact: the constitution of the House of Hydra</title>
+<meta name="description" content="The Erebus Compact: the constitution of the House of Hydra. Five values — ethos, authenticity, autonomy, privacy, accessibility — the operational laws of the House, and the dark patterns and deceptive marketing the Council forbids.">
+<meta property="og:title" content="The Erebus Compact">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://deck.mock1ngbb.com/hydrav11/erebus-compact">
+<link rel="canonical" href="https://deck.mock1ngbb.com/hydrav11/erebus-compact">
+<meta name="robots" content="index, follow">
+<style>
+/* EREBUS dark theme (rift-runes) · WCAG AA · shared token palette */
+:root {
+  --ink:#0A0A0B; --ink-2:#111114; --ink-3:#17171B;
+  --line:#26262C; --line-2:#1C1C21;
+  --grey-4:#E8E8EA; --grey-3:#B5B5BD; --grey-2:#8B8B95; --grey-1:#7C7C85;
+  --violet:#A855F7; --violet-bright:#C084FC; --cyan:#22D3EE;
+  --lime:#A3E635; --amber:#F5A524; --rose:#F07178;
+  --font-display:"Instrument Serif","Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --font-body:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --measure: 68ch;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  font-size: 16px; line-height: 1.7;
+  color: var(--grey-4); background: var(--ink);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+header {
+  position: sticky; top: 0; z-index: 20; background: var(--ink);
+}
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.5rem; max-width: 1024px; margin: 0 auto;
+  border-bottom: 1px solid var(--line);
+}
+nav .brand {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-family: var(--font-display); color: var(--grey-2);
+  font-size: 0.9rem; letter-spacing: 0.05em;
+}
+nav .brand svg { opacity: 0.7; }
+nav a {
+  color: var(--violet-bright); text-decoration: none; font-size: 0.85rem;
+  padding: 0.4rem 0.9rem; border: 1px solid var(--line);
+  border-radius: 999px; background: var(--ink-3);
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+nav a:hover { color: var(--cyan); border-color: var(--cyan); background: var(--ink-2); }
+.container { width: 100%; max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
+main { padding: 4rem 0 2rem; }
+.kicker {
+  font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--violet-bright); margin-bottom: 1rem;
+}
+h1 {
+  font-family: var(--font-display); font-weight: 400; color: var(--grey-4);
+  font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.08; letter-spacing: -0.02em;
+  margin-bottom: 1.25rem; text-wrap: balance;
+}
+h1 em { font-style: italic; color: var(--violet-bright); }
+.creed {
+  color: var(--grey-3); font-family: var(--font-display); font-style: italic;
+  font-size: 1.15rem; max-width: var(--measure); margin-bottom: 2rem;
+}
+.section-label {
+  font-family: var(--font-body); font-size: 12px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--grey-2); margin: 3rem 0 1rem;
+}
+ol.axioms { list-style: none; padding: 0; max-width: var(--measure); counter-reset: axiom; }
+ol.axioms li {
+  position: relative; padding: 1.25rem 0 1.25rem 3.25rem;
+  border-top: 1px solid var(--line); counter-increment: axiom;
+}
+ol.axioms li::before {
+  content: counter(axiom, decimal-leading-zero);
+  position: absolute; left: 0; top: 1.25rem;
+  font-family: var(--font-body); font-size: 12px; letter-spacing: 0.12em;
+  color: var(--violet-bright);
+}
+ol.axioms li:last-child { border-bottom: 1px solid var(--line); }
+ol.axioms h2 {
+  font-family: var(--font-body); font-weight: 700; color: var(--grey-4);
+  font-size: 1.05rem; letter-spacing: 0.02em; margin-bottom: 0.4rem;
+}
+ol.axioms p { color: var(--grey-2); font-size: 0.92rem; }
+ol.forbidden { list-style: none; padding: 0; max-width: var(--measure); counter-reset: forbid; }
+ol.forbidden li {
+  position: relative; padding: 1.25rem 0 1.25rem 3.25rem;
+  border-top: 1px solid var(--line); counter-increment: forbid;
+}
+ol.forbidden li::before {
+  content: counter(forbid, decimal-leading-zero);
+  position: absolute; left: 0; top: 1.25rem;
+  font-family: var(--font-body); font-size: 12px; letter-spacing: 0.12em;
+  color: var(--rose);
+}
+ol.forbidden li:last-child { border-bottom: 1px solid var(--line); }
+ol.forbidden h2 {
+  font-family: var(--font-body); font-weight: 700; color: var(--rose);
+  font-size: 1.05rem; letter-spacing: 0.02em; margin-bottom: 0.4rem;
+}
+ol.forbidden p { color: var(--grey-2); font-size: 0.92rem; }
+ol.axioms code, ol.forbidden code {
+  font-family: var(--font-body); font-size: 0.9em; color: var(--cyan);
+  background: var(--ink-2); border: 1px solid var(--line-2);
+  border-radius: 3px; padding: 0.1em 0.35em;
+}
+.note {
+  margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--line);
+  color: var(--grey-1); font-size: 0.85rem; font-style: italic; max-width: var(--measure);
+}
+a { color: var(--violet-bright); text-decoration: none; border-bottom: 1px solid var(--violet); }
+a:hover { color: var(--cyan); border-bottom-color: var(--cyan); }
+a:visited { color: var(--violet); }
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: 2px; }
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  padding: 10px 14px; background: var(--violet-bright); color: var(--ink);
+  font-family: var(--font-body); font-size: 12px; text-transform: uppercase;
+  letter-spacing: 0.14em; border-bottom-right-radius: 4px;
+}
+.skip-link:focus-visible { left: 0; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+@media (max-width: 600px) { main { padding: 2.5rem 0 1.5rem; } }
+@media print { body { background: #ffffff; color: #000; } }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header>
+<nav aria-label="Primary">
+  <div class="brand">
+    <svg width="24" height="28" viewBox="0 0 100 120" aria-hidden="true">
+      <path d="M50 5 L90 25 L90 70 Q90 100 50 115 Q10 100 10 70 L10 25 Z" fill="none" stroke="#8B8B95" stroke-width="3"/>
+      <path d="M35 50 L50 35 L65 50 L50 65 Z" fill="none" stroke="#8B8B95" stroke-width="2"/>
+      <path d="M20 30 Q50 40 80 30" fill="none" stroke="#8B8B95" stroke-width="1.5" opacity="0.6"/>
+    </svg>
+    <span>The Erebus Compact</span>
+  </div>
+  <div class="nav-links">
+    <a href="/hydrav11">Back to hydratype</a>
+  </div>
+</nav>
+</header>
+
+<main id="main">
+  <div class="container">
+    <div class="kicker">House of Hydra · Article IV, as amended</div>
+    <h1>The Erebus Compact</h1>
+    <p class="creed">
+      Let every keystroke be judged in the dark. Keep the voice that made it, guard the threshold it
+      never crossed, open the house to every hand, and rent no ledger to advertisers.
+    </p>
+
+    <div class="section-label">The Values — first among the Articles</div>
+    <ol class="axioms">
+      <li>
+        <h2>Article I: The Typer Is the First Citizen</h2>
+        <p>Every keystroke belongs to the hand that made it. We build tools, not traps; the typer comes first, and the product, the revenue, and the myth come after. Simplicity is integrity: we never ship complexity to hide behavior. A feature that needs deception to be adopted does not deserve to ship.</p>
+      </li>
+      <li>
+        <h2>Article II: The Words on Screen and in Code Are the Same Text</h2>
+        <p>We claim no fact we cannot prove, and we mark every fallback as a fallback. Every number we publish carries its methodology, its noise, and what it does not claim. We keep the typer's voice — slang, dialect, profanity — rather than sand it into our idea of correct. A product that must lie to be believed has already lost.</p>
+      </li>
+      <li>
+        <h2>Article III: The Author Is the Owner</h2>
+        <p>The typer owns the text they type and the correction we offer. Every action is reversible, every setting changeable, every model swappable, every endpoint replaceable; nothing in this House is a locked door. Consent is only real when refusal is as easy as acceptance. Exit rights are not a feature; they are the point.</p>
+      </li>
+      <li>
+        <h2>Article IV: The Threshold That Never Opens</h2>
+        <p>On-device is the default, not a premium. The keyboard does zero networking; only the host app may carry an offering, and only what the typer knowingly sent. Telemetry is opt-in, differentially-noised, and data-minimized — never raw text, never re-identifiable. The question is never <em>can we collect this?</em> but <em>is this worth betraying the trust that typed it?</em> Keys live in the Vault, drawn at call time, held for one breath, never on disk.</p>
+      </li>
+      <li>
+        <h2>Article V: The House Is Open to Every Hand</h2>
+        <p>If a person with a disability cannot use the House, it is not finished. WCAG is the law of the land: keyboard-operable, high-contrast, text alternatives, controls with names, no timing traps. Accessibility is the trunk, not a branch; we design for the full spectrum of vision, hearing, motor, and cognition. The same meaning-first engine that forgives a tremor forgives a fat-fingered tap.</p>
+      </li>
+    </ol>
+
+    <div class="section-label">The Operational Laws of the House</div>
+    <ol class="axioms">
+      <li>
+        <h2>Article VI: The Vault Is the Only Threshold</h2>
+        <p>No secret shall be written into the skin of the House. API keys are not artifacts; they are invocations, drawn from the Keychain at call time, held in memory for one breath, and never committed to disk, to a log, or to a pastebin of the mind. The keyboard shall not network; the host app alone may carry the Sluagh's offerings, and it shall carry no key that was not fetched from the vault that same turn.</p>
+      </li>
+      <li>
+        <h2>Article VII: The Sluagh Must Hear Every Cry</h2>
+        <p>Every error path shall raise a structured lament. There are no empty catches, no silent nil, no return that returns nothing to the Council. A gate that emits no event is a dead god; let it be torn down. The Sluagh Swarm traces the path of each failure, and it feeds only on truth.</p>
+      </li>
+      <li>
+        <h2>Article VIII: No Number Worships Itself</h2>
+        <p>Any number reported to the Council is a public oath. It must say how it was measured, what cloud it rode, what seed it used, what differential noise the Sluagh applied, and what it does not claim. A claim that cannot be falsified is not a claim; it is marketing, and marketing is for the Gentry, not for the Commons. Publish the methodology or strike the number from the record.</p>
+      </li>
+      <li>
+        <h2>Article IX: The Model Is a Ferryman, Not a King</h2>
+        <p>No model id shall be carved into the foundation. The intent-aware path shall be a guided generation with <code>@Generable</code>, not a clattering of n-grams and edit distances. The on-device Foundation Model is a commodity ferry across the river; it may be changed, swapped, or retired by the Council. Guided generation with <code>@Generable</code> is the script, and the script is owned by HydraCore, not by any vendor. A hardcoded model id is a crown on a dead man.</p>
+      </li>
+      <li>
+        <h2>Article X: The Gate Is a Golem</h2>
+        <p>Recurring rules shall be baked into hooks, scripts, gates, and tests, not into prose. If a rule can be mechanized, it shall be mechanized. If a human must remember it, it is a ghost, and ghosts are unreliable. Search before create: the Golem shall check the archive before any file, PR, or issue is born, and it shall refuse to birth a duplicate.</p>
+      </li>
+      <li>
+        <h2>Article XI: The Hour Is the Only Authority</h2>
+        <p>Unblocked work is executed now. Truly blocked work is filed to the task store this turn, with its blocker named and its oracle consulted. <code>Later</code> is a sloth; <code>out of scope</code> is a coward; <code>TODO</code> is a grave with no body. The Council does not defer what can be done today; it only files what cannot.</p>
+      </li>
+      <li>
+        <h2>Article XII: Age Is the Shadow of Work, Not Its Judge</h2>
+        <p>A task is not stale because it has grown grey. Old work is merged or closed on its merits, not on its birthday. The Council shall not recycle a task that can never succeed; that is a zombie, and zombies feed on turns. If a task cannot succeed, drop it with a written epitaph.</p>
+      </li>
+      <li>
+        <h2>Article XIII: Consent Is a Written Flame</h2>
+        <p>A plan plus a green light authorizes the whole scope. If the plan is approved, no one shall ask again for each step; they shall execute. If a step lies outside the plan, it is a new plan and requires a new flame. Half-executed plans are better than endless deliberations, but only if the plan was honest.</p>
+      </li>
+      <li>
+        <h2>Article XIV: The Ledger of Doom Is Kept in Ink</h2>
+        <p>Every deprecation, every warning, every shrug shall surface as a task with a canonical replacement and a migration. The Archivist shall ink it. The task store is the ledger of doom; what is not inked there is not real. File it, then fix it. If you cannot fix it, file it; if you will not file it, you are writing in water.</p>
+      </li>
+    </ol>
+
+    <div class="section-label">Dark Patterns &amp; Deceptive Marketing — what the Council forbids</div>
+    <ol class="forbidden">
+      <li>
+        <h2>The Pre-Checked Trap</h2>
+        <p>A consent box that is already ticked, so the typer must act to refuse. Consent is only real when the default is the most private option and refusal is one click, never a hunt.</p>
+      </li>
+      <li>
+        <h2>The Shamed Refusal</h2>
+        <p>Confirm-shaming: wording that makes declining feel stupid or guilty — <em>&ldquo;No thanks, I prefer less privacy.&rdquo;</em> A refusal is a right, not a confession.</p>
+      </li>
+      <li>
+        <h2>The Unequal Path</h2>
+        <p>Making opt-out or deletion require a login, a support ticket, or more clicks than opt-in required. Every door in the House must open as easily as it closed.</p>
+      </li>
+      <li>
+        <h2>The Buried Ledger</h2>
+        <p>Hiding privacy controls behind <em>more options</em>, nested menus, or a search box. What the typer must be able to find, the House must place in plain sight.</p>
+      </li>
+      <li>
+        <h2>The Silent Harvest</h2>
+        <p>Collecting superfluous data, telemetry without disclosure at the point of collection, or <em>&ldquo;we use data to improve your experience&rdquo;</em> that never says what, where, or how long. The least data, named plainly, is the only harvest.</p>
+      </li>
+      <li>
+        <h2>The Phantom Anonymous</h2>
+        <p>Claiming &ldquo;anonymous&rdquo; when raw logs or persistent IDs could re-identify a typer. Our telemetry is specifically opt-in, differentially-noised, aggregate, and never raw text — if it cannot be said exactly that way, it cannot be said at all.</p>
+      </li>
+      <li>
+        <h2>The Fake Storm</h2>
+        <p>False scarcity, false urgency, countdown timers, alert fatigue, or fake error dialogs engineered to pressure consent. A House that must scare its guests is a house of thieves.</p>
+      </li>
+      <li>
+        <h2>The Bribed Number</h2>
+        <p>Advertising a metric without publishing its methodology, its noise, and what it does not claim. A hidden measure is a bribe, and the Commons deserves no bribes.</p>
+      </li>
+      <li>
+        <h2>The Whitewashed Claim</h2>
+        <p>Saying &ldquo;nothing leaves your device&rdquo; while obscuring the host app's opt-in telemetry, or calling something &ldquo;free&rdquo; that costs privacy, network access, or time. Extraordinary claims require extraordinary proof.</p>
+      </li>
+      <li>
+        <h2>The Sanitized Voice</h2>
+        <p>Rewriting the typer's deliberate slang, dialect, or profanity into &ldquo;correct&rdquo; speech, or censoring the author's voice inside the correction itself. The House keeps the voice; it does not clean it.</p>
+      </li>
+    </ol>
+
+    <div class="section-label">The House's Mechanical Antipatterns — the Council forbids these too</div>
+    <ol class="forbidden">
+      <li>
+        <h2>The Duplicate Storm</h2>
+        <p>A rite that spawns the same file, PR, or issue without first consulting the archive. Every duplicate is a lie in the ledger, and the Sluagh wastes its breath tracing echoes.</p>
+      </li>
+      <li>
+        <h2>The Zombie Loop</h2>
+        <p>Recycling a task that can never succeed, bypassing the gates that should have closed it. A corpse cannot be revived by more turns; it must be buried with a written epitaph, not resurrected.</p>
+      </li>
+      <li>
+        <h2>The Eager Compiler</h2>
+        <p>Treating compilation as evidence of execution. A build that emits no events has told you nothing; silent code is a sleeping serpent. A gate that cannot fail is not a gate.</p>
+      </li>
+      <li>
+        <h2>The Silent Ledger</h2>
+        <p>Empty catches, silent nil, swallowed errors, silent NaN, silent token caps. The Sluagh cannot trace what the House refuses to say. Loud by default is the only default.</p>
+      </li>
+      <li>
+        <h2>The Mistaken Jurisdiction</h2>
+        <p>Conflating distinct compute or ownership boundaries: the keyboard's zero-network vow, the host app's upload path, the Cloudflare backend's telemetry, and the Keychain's vault are separate realms. A secret fetched for one realm may be a poison in another.</p>
+      </li>
+      <li>
+        <h2>The Carved Crown</h2>
+        <p>Hardcoding a model id, a secret string, a hostname, or any value that the Council did not bless and the vault does not hold. The model is a commodity and the key is a breath; neither may be chiseled in stone.</p>
+      </li>
+      <li>
+        <h2>The Vaulted Gossip</h2>
+        <p>Assuming a shared token or secret without verifying the callee's actual secret name and jurisdiction. A browser-facing worker holding a server secret is a cracked window. Trust is not a union of names; it is a match of exact keys.</p>
+      </li>
+      <li>
+        <h2>The Trusted Scroll</h2>
+        <p>Believing a JSDoc comment, a README, or a stale grep count without reading the callee source and the exact command. A comment is poetry, not a contract, and a stale count is a ghost in the ledger.</p>
+      </li>
+      <li>
+        <h2>The Re-Reaped Harvest</h2>
+        <p>Re-running an agent that ran out of turns instead of dispatching a targeted completion agent. A partial reaping does not feed the village; it only starves it slower.</p>
+      </li>
+      <li>
+        <h2>The Deferred Oath</h2>
+        <p>Resolving a task with <code>later</code>, <code>out of scope</code>, or <code>TODO</code> instead of doing the work or filing it. A note is not a deed, and the ledger of doom is not a scrapbook.</p>
+      </li>
+      <li>
+        <h2>The Chasing Shade</h2>
+        <p>Chasing a platform symptom such as HTTP 408 while the true failure grows downstream. The Sluagh feeds on the root cause, not the rustle at the gate.</p>
+      </li>
+    </ol>
+
+    <p class="note">
+      The Compact is the constitution of the House of Hydra. It is enforced mechanically, by hooks and
+      gates and tests, never by memory. Read the project from the top:
+      <a href="/hydrav11">hydratype, Article IV</a>, or the
+      <a href="https://github.com/mock1ngbb/hydratype">source</a>.
+    </p>
+  </div>
+</main>
+
+</body>
+</html>

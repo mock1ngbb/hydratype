@@ -1,0 +1,12 @@
+name = "hydrav11"
+main = "worker.js"
+compatibility_date = "2026-06-16"
+account_id = "a62c1c7880b50ac345fc7c2135f6ae84"
+workers_dev = false
+
+routes = [{ pattern = "deck.mock1ngbb.com/hydrav11", custom_domain = false }, { pattern = "deck.mock1ngbb.com/hydrav11/*", custom_domain = false }]
+
+tail_consumers = []
+
+[observability]
+enabled = false

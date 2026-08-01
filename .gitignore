@@ -2,6 +2,7 @@
 .DS_Store
 build/
 DerivedData/
+.codewhale/
 # The Xcode project is GENERATED from project.yml by XcodeGen — never committed,
 # never hand-edited. Run `scripts/bootstrap-xcode.sh` (or `xcodegen generate`) after
 # pulling. Editing structure means editing project.yml, then regenerating.

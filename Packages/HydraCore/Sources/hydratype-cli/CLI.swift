@@ -16,6 +16,8 @@ struct HydraTypeCLI {
         FileHandle.standardError.write(Data("hydratype-cli — reading lines from stdin (Ctrl-D to end)\n".utf8))
 
         let corrector = AFMCorrector()
+        var hadErrors = false
+
         while let line = readLine(strippingNewline: true) {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
             guard !trimmed.isEmpty else { continue }
@@ -31,14 +33,16 @@ struct HydraTypeCLI {
                 print("   noChange:   \(result.noChange)")
                 print("   latency:    \(ms) ms")
             } catch {
-                // LOUD: surface the typed error to stderr, keep the loop alive.
+                // LOUD: surface the typed error to stderr, keep the loop alive,
+                // but set an error flag so we exit non-zero.
                 FileHandle.standardError.write(Data("ERROR: \(error)\n".utf8))
+                hadErrors = true
             }
         }
-    }
 
-    static func fail(_ message: String) -> Never {
-        FileHandle.standardError.write(Data("hydratype-cli FATAL: \(message)\n".utf8))
-        exit(1)
+        if hadErrors {
+            FileHandle.standardError.write(Data("hydratype-cli: one or more corrections failed — exiting non-zero\n".utf8))
+            exit(1)
+        }
     }
 }
