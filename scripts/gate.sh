@@ -9,16 +9,19 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PKG="$ROOT/Packages/HydraCore"
 
 # Change-scoped gating: when GATE_DIFF_BASE is set (the pre-push hook sets it to
-# origin/hee-haw), skip the SLOW swift build+test for docs-only pushes — a doc or
-# markdown change cannot affect Swift, so it shouldn't pay a full build + XCTest.
-# The erebus deck-sync check (cheap) always runs. Without GATE_DIFF_BASE (local
-# `scripts/gate.sh`, CI), the FULL gate always runs.
+# origin/hee-haw), skip the SLOW swift build+test for docs-only pushes. FAIL-CLOSED:
+# we only skip when confident the push is docs-only — a non-empty diff AND every
+# changed path is a docs type (.md/.markdown/.txt/.html or under docs/). Any
+# code/config/script change, an empty diff (git error), or an unknown extension
+# runs the FULL gate. Without GATE_DIFF_BASE (local `scripts/gate.sh`, CI), the
+# FULL gate always runs.
 SWIFT_RELEVANT=1
 if [ -n "${GATE_DIFF_BASE:-}" ]; then
   CHANGED="$(git diff --name-only "${GATE_DIFF_BASE}...HEAD" 2>/dev/null || true)"
-  if ! echo "$CHANGED" | grep -qE '\.(swift)$|Package\.swift|project\.yml|^scripts/'; then
+  # grep -vqE: exit 0 if ANY line is NOT a docs type; ! it => all lines are docs.
+  if [ -n "$CHANGED" ] && ! echo "$CHANGED" | grep -vqE '\.(md|markdown|txt|html)$|^docs/'; then
     SWIFT_RELEVANT=0
-    echo "[gate] no Swift-relevant changes vs ${GATE_DIFF_BASE} — skipping swift build/test (docs-only)"
+    echo "[gate] docs-only change vs ${GATE_DIFF_BASE} — skipping swift build/test"
   fi
 fi
 
