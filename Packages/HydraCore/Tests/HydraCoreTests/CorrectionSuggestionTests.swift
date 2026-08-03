@@ -15,6 +15,14 @@ final class CorrectionSuggestionTests: XCTestCase {
         XCTAssertFalse(s.noChange)
     }
 
+    func testConfidenceDefaultsToOne() {
+        // Omitting confidence treats the suggestion as fully confident (1.0); a model
+        // that omits it is never spuriously downgraded to no-correction.
+        let s = CorrectionSuggestion(primary: "the")
+        XCTAssertEqual(s.confidence, 1.0)
+        XCTAssertEqual(CorrectionSuggestion(primary: "the", confidence: 0.4).confidence, 0.4)
+    }
+
     func testErrorDescriptions() {
         XCTAssertTrue(CorrectorError.modelUnavailable(reason: "device busy").description.contains("modelUnavailable"))
         XCTAssertTrue(CorrectorError.foundationModelsUnavailable.description.contains("foundationModelsUnavailable"))
