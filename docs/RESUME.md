@@ -40,10 +40,22 @@ live IDs are listed so nothing is lost to a restart.
 - deploy-manifest uses a `script` gate placeholder; merge-warden's `cicada/policy` proof is policy-only
   (a broken build could auto-merge). A real lane enables a server-side `cicada/build` check.
 
-### 3. wyrd R2 backup failing (new)
-- **Wyrd:** `hydratype` → `064f406a`
-- `[wyrd-local] r2 backup failed: fetch failed`; `bifrost-backups.r2.dev` → **HTTP 500**. Backups aren't
-  reaching R2. Investigate the R2 bucket/worker. (Separate from the fixed write-relay readback bug.)
+### 3. wyrd R2 backup — RESOLVED 2026-08-03 (bifrost-bridge PR #5976)
+- The original framing was wrong on two counts. Backups **were** reaching R2 (2,648 objects, every
+  hour of the day covered), and `bifrost-backups.r2.dev` → HTTP 500 is a **red herring** — that
+  public dev URL is not on the backup path, which uses the CF REST API. The cited wyrd id
+  `064f406a` did not exist in the store.
+- Real defect: `com.mock1ng.wyrd-snapshot` was exiting **2** (`die()` in `cmdBackup`) because the R2
+  PUT had **no retry** — `wyrd-snapshot.log` carries 50+ `fetch failed` and several 30s timeouts
+  against `api.cloudflare.com`, so a single blip dropped that hour's snapshot outright.
+- Fixed: exponential-backoff retry (default 4 attempts; 5xx/429 retry, other 4xx fail fast), plus
+  `scripts/mac-env/bin/wyrd-backup-health.sh` — a negative-proofed gate that fails loud on any
+  `com.mock1ng.*` job with a nonzero last-exit or a stale newest backup, and exits 2 (never 0) when
+  it cannot verify.
+- Also found and removed: `com.mock1ng.r2-hourly-snapshot` had sat at launchd **exit 78** since the
+  day it was created — never ran once, wrote no logs, a dead duplicate of `wyrd-snapshot` caused by
+  a `/Users/mock1ng` vs `/Users/mock1ngbb` typo. The gate then surfaced 5 more dead jobs; all filed
+  in bifrost-bridge (`de242496`, `6605505b`, `ec6042ed`, `0bcfbdbe`, `f13ca4dd`).
 
 ### 4. Verify merge-warden stays in sync after auto-deploy
 - **Wyrd:** `hydratype` → `b53713ea`
@@ -78,8 +90,10 @@ live IDs are listed so nothing is lost to a restart.
 
 ## How to resume (fast path)
 1. **E-SPIKE-1 iOS run** — get a physical AFM iPhone, run `Probe.swift`, fill the verdict. The product gate.
-2. **Investigate the R2 backup 500** — backups aren't reaching R2.
-3. **Wire the deploy lane / server-side build gate** so the merge gate proves the build.
+2. **Wire the deploy lane / server-side build gate** so the merge gate proves the build.
+
+(The R2 backup item is resolved — see §3 above. Backups were landing all along; the real bug was a
+missing retry around a flaky R2 PUT, fixed in bifrost-bridge PR #5976.)
 
 Deck (live): `deck.mock1ngbb.com/hydrav11/erebus-compact` · Erebus Compact governance wired into
 `CLAUDE.md` + `scripts/gate.sh`. Core: `Packages/HydraCore` (hybrid corrector, DP telemetry, bench).
