@@ -16,6 +16,7 @@ its public surface).
 | `CorrectionStore.swift` | E1-S4 | Raw-SQLite3 App-Group store of correction events; append / recentUnsynced / markSynced. |
 | `Sources/hydratype-cli` | E1b-S1 | Headless stdin→correction CLI (the fast build-test-observe loop). |
 | `Sources/hydracore-check` | — | Framework-free runnable logic gate (see below). |
+| `Sources/hydracore-bench` | — | Fast-path quality/regression benchmark harness (see below). |
 | `Tests/HydraCoreTests` | — | XCTest suite (Xcode toolchain). |
 
 ## Toolchain requirement
@@ -46,6 +47,19 @@ swift test
 # Real on-device AFM correction (host with Apple Intelligence available):
 echo "i cant beleive it" | swift run hydratype-cli
 # → primary: I can’t believe it.  (live-verified 2026-07-19)
+```
+
+## Benchmark / regression harness
+
+Runs the fast `EditDistanceCorrector` over a 30-entry corpus of real single-word
+typos (`Sources/hydracore-bench/Corpus.swift`), reporting per-item + average latency
+and how many corrections match the expected word (accuracy). No live AFM is
+required. Exit 0 on all-pass fast-path accuracy, non-zero (LOUD) on any mismatch —
+so it doubles as a regression gate against dictionary / tie-break changes.
+
+```sh
+swift run hydracore-bench            # fast-path latency + accuracy
+swift run hydracore-bench --hybrid   # also route through HybridCorrector (AFM skipped when no live model)
 ```
 
 ## Axioms honored
