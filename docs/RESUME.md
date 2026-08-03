@@ -59,6 +59,12 @@ What is unfinished after this session and how to pick it back up. Every item is 
 - **What:** `PUT /collaborators/rip-rooter` returned 204 but role still reads `write`. The webhook
   works (created via owner token `bifrost-GITHUB_TOKEN`), but the bot's admin status is unresolved.
 
+### 7. Reconcile crypt-core `manifestPath`
+- **Wyrd:** `hydratype` → `8bf741b3`
+- **What:** vault-keeper registration defaulted `manifestPath` to `.bifrost/deploy.yaml`, but
+  hydratype's actual manifest is `.bifrost/deploy-manifest.json`. Low impact (no real deploy), but
+  reconcile the registration so the paths agree.
+
 ---
 
 ## How to resume (fast path)
