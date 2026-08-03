@@ -1,77 +1,100 @@
 # Hydratype — Session Resume
 
-**Date:** 2026-08-02 · **Author:** Claude (rip-rooter lane) · **Session type:** deck/CI-CD + red-team closeout
+**Last updated:** 2026-08-03 · **Author:** Claude (rip-rooter lane) · **Sessions:** deck/CI-CD + core + red-team
 
-What is unfinished after this session and how to pick it back up. Every item is tracked in
-**WyrdWeaver** (`wyrd`) — live IDs are listed so nothing is lost to a restart.
+> **⚠️ Why this file matters right now:** the **wyrd write-relay is down** (`wyrd-capture` →
+> "created but not readable on V2 within poll budget (write-relay never drained)" since 2026-08-03),
+> so **new WyrdWeaver tasks are not being confirmed**. Until the relay recovers, THIS document is the
+> authoritative record of what's unfinished. Re-file items to wyrd once the relay is back.
 
 ---
 
-## Done this session (no action needed)
+## Done (no action needed)
 
-- **Erebus Compact** reworked into a values-led constitution (Ethos, Authenticity, Autonomy, Privacy,
-  Accessibility) → merged (PR #5), deck redeployed live.
-- **Wired hydratype into charon-cicada**: crypt-core enrollment, GitHub webhook → cicd-intake
-  (`push`+`pull_request`), merge-warden `WATCHED_REPOS`. **Auto + manual merge proven** (PR #6
-  auto-merged via `POST /v1/run`).
-- **Build gate**: composite pre-push hook (`scripts/gate.sh` → cicada-policy hook); deck-sync check
-  mechanized into `scripts/gate.sh` (`check-erebus-sync.sh`).
-- **Worktree cleanup**: removed merged `wt-cicada-onboard` + `wt/hydrav11-theme`.
+**Session 1 (deck / CI-CD / governance):**
+- Erebus Compact → values-led constitution; deck redeployed live.
+- hydratype enrolled in charon-cicada: crypt-core vault-keeper, GitHub webhook → cicd-intake,
+  merge-warden `WATCHED_REPOS`. Auto + manual merge proven.
+- Build gate (pre-push `gate.sh` → cicada-policy); deck-sync check mechanized.
+- **bifrost-bridge PR #5919 merged** (merge-warden watch hydratype on bifrost-bridge main).
+- **Main checkout reconciled** (reset to origin; the divergent red-team/deck line was superseded).
+
+**Session 2 (core / macOS pivot / loom):**
+- **macOS M5 pivot:** on-device AFM **IN_PROCESS_OK** — `hydratype-cli` ran a real correction
+  (`"i cant beleive it"` → `"I can't believe it."`, latency ~1.6s, footprint 3.6→13.2 MB).
+- **Hybrid corrector** (fast Damerau-Levenshtein + AFM escalation) — PR #10.
+- **Structured-output hardening** (confidence + deterministic no-correction fallback) — PR #11.
+- **Benchmark harness** (`hydracore-bench`, 30-entry corpus) — PR #12.
+- **DP telemetry** (`DifferentialPrivacy` — local Laplace, sensitivity + ε) — PR #13.
+- All the above auto-merged by merge-warden; main at `ee3192b`.
 
 ---
 
 ## Unfinished — pick up here, in order
 
-### 1. Land bifrost-bridge PR #5919
-- **Wyrd:** `bifrost-bridge` → `e6e2be2a` (operator/chore)
-- **What:** merge-warden change (watch `mock1ngbb/hydratype` + `[triggers]` config fix + new
-  `build-stamp.ts`) is **deployed** (Version `10d6a73c`) but the code is **not on bifrost-bridge `main`**.
-- **Resume:** operator merge → `CLAUDE_MERGE_APPROVE=5919 gh pr merge 5919 --squash` (self-merge guard applies).
+### 1. E-SPIKE-1 — iOS jetsam verdict (the #1 product gate)
+- **Wyrd:** `hydratype` → `53da1d19`
+- **What:** macOS M5 pivot **proved the model is viable** (IN_PROCESS_OK) but does NOT answer the
+  iOS question. The keyboard extension's **~50–60 MB jetsam ceiling** (`IN_EXTENSION_OK` vs
+  `BROKER_REQUIRED`) still needs `Probe.swift` run on a **physical AFM-enabled iPhone (iOS 26)**.
+- **Resume:** run the hardened `Probe.swift` (canonical `LanguageModelSession { }` form) on a real
+  iPhone; fill the spike README verdict table.
 
-### 2. Reconcile the main checkout divergence
-- **Wyrd:** `hydratype` → `759a63af` (operator/chore)
-- **What:** `/Users/mock1ngbb/AntiGH/hydratype` is stale at `8427694`, has a **local-only commit
-  (`fix(red-team) #6`) not on origin**, and is missing current files (e.g. `scripts/check-erebus-sync.sh`).
-- **Resume:** confirm the red-team commit is superseded, then `git fetch && git reset --hard origin/hee-haw`.
-
-### 3. E-SPIKE-1 — validate on-device AFM in the keyboard extension
-- **Wyrd:** `hydratype` → `53da1d19` (refiled; CLAUDE.md's `cb4b60c1` was absent from wyrd)
-- **What:** the **main product gating task**. Empirically validate Apple Foundation Models
-  (`@Generable`) inside the ~50–60 MB keyboard extension; use the host-app broker if
-  `BROKER_REQUIRED`. Hardware validation pending.
-- **Resume:** this is the real product work once the CI/deck cleanup above is closed.
-
-### 4. Wire a real deploy lane (Xcode Cloud / fastlane)
+### 2. Wire a real deploy lane (Xcode Cloud / fastlane)
 - **Wyrd:** `hydratype` → `669a0f3c`
-- **What:** deploy-manifest uses a `script` gate placeholder (`hydratype-gate`). Because there's no
-  server-side Swift build lane, merge-warden's `cicada/policy` proof is **policy-only** — a broken
-  build could auto-merge. The local pre-push gate is the only build mitigation today.
+- **What:** deploy-manifest uses a `script` gate placeholder; merge-warden's `cicada/policy` proof is
+  policy-only (a broken build could auto-merge). Local pre-push gate is the only build mitigation.
 - **Resume:** wire Xcode Cloud / fastlane → enables a server-side `cicada/build` check.
+
+### 3. Verify merge-warden stays in sync after auto-deploy
+- **Wyrd:** (unfiled — relay down)
+- **What:** the deployed `WATCHED_REPOS` once drifted to 4-repo (lost hydratype); fixed via the
+  **pinned** `npm run deploy` (`wrangler@4.100.0`). The auto-pipeline redeploys on pushes — monitor
+  for recurrence; keep the deploy method canonical.
+- **Resume:** on any bifrost-bridge deploy, confirm merge-warden still watches `mock1ngbb/hydratype`.
+
+### 4. Investigate the wyrd write-relay outage
+- **Wyrd:** (unfiled — this is the outage itself)
+- **What:** `wyrd-capture` can't confirm V2 reads ("write-relay never drained") since 2026-08-03.
+  Task filing is unreliable; the resume md is the fallback record.
+- **Resume:** check the wyrd V2 write-relay / capture pipeline; re-file the items below once it's back.
 
 ### 5. Make the pre-push build-gate durable
 - **Wyrd:** `hydratype` → `d44bc980`
 - **What:** the composite `.git/hooks/pre-push` (gate.sh → cicada-policy) is machine-local and can be
-  re-symlinked by `install-cicada-policy-hook.sh`. Not committed to the repo.
+  re-symlinked by `install-cicada-policy-hook.sh`. Not committed.
 - **Resume:** commit an installer script (pattern: `vestas-warpath/scripts/install-writing-rules-hook.sh`).
 
-### 6. Verify rip-rooter admin on hydratype
-- **Wyrd:** `hydratype` → `5869866a`
-- **What:** `PUT /collaborators/rip-rooter` returned 204 but role still reads `write`. The webhook
-  works (created via owner token `bifrost-GITHUB_TOKEN`), but the bot's admin status is unresolved.
+### 6. Fix the flaky `EditDistanceCorrectorTests.testFastUnderBudget`
+- **Wyrd:** (unfiled — relay down)
+- **What:** a 10 ms debug wall-clock budget assertion flakes under load / incremental builds
+  (verified pre-existing — fails on the clean base too). Not caused by recent work.
+- **Resume:** warm-up, a generous bound, or assert relative not absolute.
 
-### 7. Reconcile crypt-core `manifestPath`
+### 7. Loom-workflow interop: worktree gh-guard friction
+- **Wyrd:** (unfiled — relay down)
+- **What:** 2/3 loom agents hit the worktree-isolation guard blocking `gh pr create`/`gh` from the
+  agent worktree shell and worked around it (REST API / wrapper script).
+- **Resume:** document a sanctioned path for loom agents to open PRs from isolated worktrees.
+
+### 8. Verify rip-rooter admin on hydratype
+- **Wyrd:** `hydratype` → `5869866a`
+- **What:** `PUT /collaborators/rip-rooter` returned 204 but role still reads `write`; the webhook
+  works (owner token), but the bot admin status is unresolved.
+
+### 9. Reconcile crypt-core `manifestPath`
 - **Wyrd:** `hydratype` → `8bf741b3`
-- **What:** vault-keeper registration defaulted `manifestPath` to `.bifrost/deploy.yaml`, but
-  hydratype's actual manifest is `.bifrost/deploy-manifest.json`. Low impact (no real deploy), but
-  reconcile the registration so the paths agree.
+- **What:** vault-keeper registration defaulted `manifestPath` to `.bifrost/deploy.yaml`, but the
+  actual manifest is `.bifrost/deploy-manifest.json`. Low impact; reconcile the registration.
 
 ---
 
 ## How to resume (fast path)
 
-1. **Merge PR #5919** (bifrost-bridge) — operator action.
-2. **Reconcile main checkout** — `git reset --hard origin/hee-haw` after confirming the red-team commit.
-3. **Start E-SPIKE-1** — the product work. Deck + CI/CD are done and live.
+1. **E-SPIKE-1 iOS run** — get a physical AFM iPhone, run `Probe.swift`, fill the verdict. This is the
+   real product gate.
+2. **Fix the wyrd write-relay** so task tracking is trustworthy again.
+3. **Wire the deploy lane / server-side build gate** to make the merge gate prove the build.
 
-Deck (live): `deck.mock1ngbb.com/hydrav11/erebus-compact` · Erebus Compact governance is wired into
-`CLAUDE.md` (auto-loads every session) and `scripts/gate.sh`.
+Deck (live): `deck.mock1ngbb.com/hydrav11/erebus-compact` · Erebus Compact governance wired into
+`CLAUDE.md` + `scripts/gate.sh`. Core: `Packages/HydraCore` (hybrid corrector, DP telemetry, bench).
