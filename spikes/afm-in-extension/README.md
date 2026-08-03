@@ -17,6 +17,26 @@ Hardening ref: **H1** (AFM in-extension "highly improbable"; fedelm 2026-07-19).
 > of `{IN_EXTENSION_OK | BROKER_REQUIRED}` with real memory numbers (and, if
 > broker, a measured round-trip latency).
 
+## macOS M5 pivot (2026-08-03) — on-device AFM VIABLE on Apple Silicon
+
+**Pivot:** validated on a MacBook Air M5 (macOS 26, Apple Intelligence enabled) via the existing
+`hydratype-cli` / `AFMCorrector` (the real on-device correction path), before needing an
+AFM-enabled iPhone. This answers the **model-viability** question; it does NOT answer the iOS
+~50–60 MB keyboard-jetsam question (that still needs an iPhone — macOS has no such ceiling and
+`os_proc_available_memory()` is `API_UNAVAILABLE(macos)`).
+
+Measured (one-shot `respond(to:generating:)`, `@Generable CorrectionSuggestion`):
+- `SystemLanguageModel.default.availability` → **available**
+- input `"i cant beleive it"` → primary **"I can't believe it."** (`noChange: false`)
+- **latency 1611 ms** (one-shot; ~1.6 s → supports the hybrid design: keep a fast
+  n-gram/edit-distance path for common corrections, reserve AFM for ambiguous/sentence cases)
+- **client footprint 3.6 → 13.2 MB (Δ ~9.6 MB)** — the model runs in a separate OS process, so
+  the caller's own footprint stays small
+
+Verdict so far: **IN_PROCESS_OK on macOS (M5)** — the on-device model is viable for autocorrect.
+The iOS keyboard-extension question (`IN_EXTENSION_OK | BROKER_REQUIRED`) remains PENDING-HARDWARE
+and requires the `Probe.swift` run on an actual iOS 26 device.
+
 ---
 
 ## Hypothesis
