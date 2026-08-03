@@ -46,7 +46,9 @@ public struct AFMCorrector: Sendable {
     /// One-shot guided correction.
     public func correct(_ text: String) async throws -> CorrectionSuggestion {
         try ensureAvailable()
-        let session = LanguageModelSession(instructions: instructions)
+        let session = LanguageModelSession {
+            instructions
+        }
         do {
             let response = try await session.respond(
                 to: text,
@@ -72,7 +74,9 @@ public struct AFMCorrector: Sendable {
         let instructions = self.instructions
         return AsyncThrowingStream { continuation in
             let task = Task {
-                let session = LanguageModelSession(instructions: instructions)
+                let session = LanguageModelSession {
+                    instructions
+                }
                 do {
                     let stream = session.streamResponse(
                         to: text,
