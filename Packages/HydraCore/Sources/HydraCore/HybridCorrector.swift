@@ -23,6 +23,11 @@ extension AFMCorrector: Correcting {}
 /// Routes single-word corrections to the fast edit-distance path, escalating
 /// multi-word / low-confidence / ambiguous input to AFM.
 public struct HybridCorrector: Sendable {
+    /// Floor for the model's `confidence` (0...1) below which we refuse to apply a
+    /// guess. Below this we deterministically return the input unchanged with
+    /// `noChange = true` rather than risk a bad correction. Values at or above this
+    /// threshold pass through.
+    public static let minConfidenceForCorrection: Double = 0.5
     private let edit: EditDistanceCorrector
     private let afm: any Correcting
 
@@ -40,12 +45,34 @@ public struct HybridCorrector: Sendable {
 
     /// Corrects `text`. Single-word high-confidence edits never touch the model;
     /// everything else escalates to AFM. `source` on the result reports the path.
+    ///
+    /// If the escalation path returns an empty `primary` or a `confidence` below
+    /// `minConfidenceForCorrection`, we deterministically return `text` unchanged with
+    /// `noChange = true` instead of a bad guess — and we never throw on this case.
     public func correct(_ text: String) async throws -> CorrectionSuggestion {
         if let fast = fastPathSuggestion(for: text) {
             return fast
         }
         var suggestion = try await afm.correct(text)
         suggestion.source = .afm
+        return noCorrectionIfNeeded(suggestion, for: text)
+    }
+
+    /// Guards the escalation result. An empty primary, or a confidence below the
+    /// floor (a `NaN`/negative/low value counts as below the floor), collapses to the
+    /// input unchanged with `noChange = true`. Never throws. This is the deterministic
+    /// fallback that keeps a malformed model output from becoming a bad correction.
+    private func noCorrectionIfNeeded(_ suggestion: CorrectionSuggestion, for text: String) -> CorrectionSuggestion {
+        // `confidence >= floor` is false for NaN, so a NaN (or otherwise out-of-range)
+        // confidence also collapses to no-correction — the safe direction.
+        guard !suggestion.primary.isEmpty,
+              suggestion.confidence >= Self.minConfidenceForCorrection else {
+            return CorrectionSuggestion(
+                primary: text,
+                noChange: true,
+                source: .afm
+            )
+        }
         return suggestion
     }
 

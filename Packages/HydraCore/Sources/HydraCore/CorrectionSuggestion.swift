@@ -35,11 +35,20 @@ public struct CorrectionSuggestion: Equatable, Sendable {
     /// guided generation — it is metadata about how the correction was reached.
     public var source: CorrectionSource
 
-    public init(primary: String, alternates: [String] = [], noChange: Bool = false, source: CorrectionSource = .afm) {
+    /// How confident the model is in `primary`, in `0...1` (1.0 = fully confident).
+    /// Defaults to `1.0` so a model that omits it is treated as fully confident — the
+    /// conservative direction is *low*, which `HybridCorrector` treats as a signal to
+    /// fall back to no-correction. `@Generable` requires every stored property to be
+    /// `ConvertibleFromGeneratedContent`; `Double` qualifies, and the default lets
+    /// guided generation omit it.
+    public var confidence: Double = 1.0
+
+    public init(primary: String, alternates: [String] = [], noChange: Bool = false, source: CorrectionSource = .afm, confidence: Double = 1.0) {
         self.primary = primary
         self.alternates = alternates
         self.noChange = noChange
         self.source = source
+        self.confidence = confidence
     }
 }
 
