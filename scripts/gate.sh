@@ -8,15 +8,31 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PKG="$ROOT/Packages/HydraCore"
 
-echo "[gate] swift build (HydraCore)…"
-( cd "$PKG" && swift build --disable-sandbox )
+# Change-scoped gating: when GATE_DIFF_BASE is set (the pre-push hook sets it to
+# origin/hee-haw), skip the SLOW swift build+test for docs-only pushes — a doc or
+# markdown change cannot affect Swift, so it shouldn't pay a full build + XCTest.
+# The erebus deck-sync check (cheap) always runs. Without GATE_DIFF_BASE (local
+# `scripts/gate.sh`, CI), the FULL gate always runs.
+SWIFT_RELEVANT=1
+if [ -n "${GATE_DIFF_BASE:-}" ]; then
+  CHANGED="$(git diff --name-only "${GATE_DIFF_BASE}...HEAD" 2>/dev/null || true)"
+  if ! echo "$CHANGED" | grep -qE '\.(swift)$|Package\.swift|project\.yml|^scripts/'; then
+    SWIFT_RELEVANT=0
+    echo "[gate] no Swift-relevant changes vs ${GATE_DIFF_BASE} — skipping swift build/test (docs-only)"
+  fi
+fi
 
-# swift run triggers sandboxed manifest re-evaluation, so run the binary directly.
-echo "[gate] run hydracore-check (logic gate)…"
-( cd "$PKG" && .build/debug/hydracore-check )
+if [ "$SWIFT_RELEVANT" = "1" ]; then
+  echo "[gate] swift build (HydraCore)…"
+  ( cd "$PKG" && swift build --disable-sandbox )
 
-echo "[gate] swift test (XCTest)…"
-( cd "$PKG" && swift test --disable-sandbox )
+  # swift run triggers sandboxed manifest re-evaluation, so run the binary directly.
+  echo "[gate] run hydracore-check (logic gate)…"
+  ( cd "$PKG" && .build/debug/hydracore-check )
+
+  echo "[gate] swift test (XCTest)…"
+  ( cd "$PKG" && swift test --disable-sandbox )
+fi
 
 echo "[gate] erebus deck integrity (Compact constitution stays synced)…"
 ( cd "$ROOT" && ./scripts/check-erebus-sync.sh )
