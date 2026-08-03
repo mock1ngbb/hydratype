@@ -73,6 +73,30 @@ public struct CorrectionEvent: Sendable, Equatable {
     }
 }
 
+/// A per-cohort aggregate of unsynced correction events (DATA-MODEL.md §C/§G).
+///
+/// Raw event fields (`before`/`suggested`/`source`) never appear — only the
+/// counts, tagged by cohort. When `isNoised` is true the counts have had local
+/// differential-privacy noise applied and are transmit-safe; when false they are
+/// raw counts for the on-device dashboard (E4) and must never be transmitted.
+public struct CorrectionAggregate: Sendable, Equatable {
+    /// Cohort tag (`baseline` / `local_afm` / `cloud_assisted`).
+    public let cohort: String
+    /// (Noised) count of contributed events in this cohort.
+    public let count: Double
+    /// (Noised) count of accepted events in this cohort.
+    public let acceptedCount: Double
+    /// Whether DP noise was applied. `false` ⇒ raw, local-dashboard-only counts.
+    public let isNoised: Bool
+
+    public init(cohort: String, count: Double, acceptedCount: Double, isNoised: Bool) {
+        self.cohort = cohort
+        self.count = count
+        self.acceptedCount = acceptedCount
+        self.isNoised = isNoised
+    }
+}
+
 public enum StoreError: Error, CustomStringConvertible {
     case open(String)
     case prepare(String)
@@ -244,6 +268,63 @@ public final class CorrectionStore: @unchecked Sendable {
             defer { sqlite3_finalize(stmt) }
             guard sqlite3_step(stmt) == SQLITE_ROW else { throw StoreError.step(errmsg()) }
             return Int(sqlite3_column_int(stmt, 0))
+        }
+    }
+
+    /// Aggregate the unsynced events by cohort tag, optionally applying local
+    /// differential-privacy noise before the aggregate leaves the device.
+    ///
+    /// - Parameters:
+    ///   - dp: the DP mechanism. Pass a configured `DifferentialPrivacy` when the
+    ///         user has opted in — the returned counts are noised and
+    ///         transmit-safe. Pass `nil` for raw counts (on-device dashboard
+    ///         only; these must NEVER be transmitted, E4).
+    ///   - seed: RNG seed for the noise. Production leaves the random default;
+    ///         tests pass a fixed seed for determinism.
+    public func cohortAggregates(
+        dp: DifferentialPrivacy?,
+        seed: UInt64 = UInt64.random(in: .min ... .max)
+    ) throws -> [CorrectionAggregate] {
+        try lock.withLock {
+            let sql = """
+            SELECT inference_tier, COUNT(*), SUM(accepted)
+            FROM corrections WHERE synced = 0
+            GROUP BY inference_tier;
+            """
+            var stmt: OpaquePointer?
+            guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
+                throw StoreError.prepare(errmsg())
+            }
+            defer { sqlite3_finalize(stmt) }
+
+            // Count and accepted-count both have sensitivity 1: adding/removing
+            // one event changes each by at most 1.
+            var result: [CorrectionAggregate] = []
+            var rng: any RandomNumberGenerator = SplitMix64(seed: seed)
+            while true {
+                let rc = sqlite3_step(stmt)
+                if rc == SQLITE_DONE { break }
+                guard rc == SQLITE_ROW else { throw StoreError.step(errmsg()) }
+                guard let cohortPtr = sqlite3_column_text(stmt, 0) else {
+                    throw StoreError.parse("nil inference_tier in aggregate row")
+                }
+                let cohort = String(cString: cohortPtr)
+                let count = Double(sqlite3_column_int64(stmt, 1))
+                let accepted = Double(sqlite3_column_int64(stmt, 2))
+                if let dp {
+                    result.append(CorrectionAggregate(
+                        cohort: cohort,
+                        count: dp.noised(count, using: &rng),
+                        acceptedCount: dp.noised(accepted, using: &rng),
+                        isNoised: true
+                    ))
+                } else {
+                    result.append(CorrectionAggregate(
+                        cohort: cohort, count: count, acceptedCount: accepted, isNoised: false
+                    ))
+                }
+            }
+            return result
         }
     }
 
