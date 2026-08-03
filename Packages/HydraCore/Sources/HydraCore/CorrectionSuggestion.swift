@@ -6,6 +6,18 @@
 
 import FoundationModels
 
+/// Which correction path produced a suggestion. Discriminates the fast edit-distance
+/// path from the on-device AFM escalation so callers can shadow-measure honest latency
+/// and cost per tier (see `HybridCorrector`). Distinct from `SuggestionSource` (which
+/// tags telemetry rows); this is the runtime, per-call discriminator.
+@Generable
+public enum CorrectionSource: String, Sendable, Equatable, Codable, CaseIterable {
+    /// Produced by `EditDistanceCorrector` on the fast single-word path.
+    case fastEditDistance
+    /// Produced by the AFM escalation (`AFMCorrector` / injected stub).
+    case afm
+}
+
 @Generable
 public struct CorrectionSuggestion: Equatable, Sendable {
     @Guide(description: "The single best correction of the user's text, preserving intent and tone.")
@@ -17,10 +29,17 @@ public struct CorrectionSuggestion: Equatable, Sendable {
     @Guide(description: "True only if the text was already correct and no change is needed.")
     public var noChange: Bool
 
-    public init(primary: String, alternates: [String] = [], noChange: Bool = false) {
+    /// Which path ran. Defaults to `.afm` so existing call sites (and the @Generable
+    /// guided-generation constructor) compile unchanged; `HybridCorrector` sets it to
+    /// `.fastEditDistance` when it short-circuits without the model. Not produced by
+    /// guided generation — it is metadata about how the correction was reached.
+    public var source: CorrectionSource
+
+    public init(primary: String, alternates: [String] = [], noChange: Bool = false, source: CorrectionSource = .afm) {
         self.primary = primary
         self.alternates = alternates
         self.noChange = noChange
+        self.source = source
     }
 }
 

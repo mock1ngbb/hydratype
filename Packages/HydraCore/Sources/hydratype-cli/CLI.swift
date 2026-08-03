@@ -1,6 +1,8 @@
 // E1b-S1 — headless macOS CLI harness over HydraCore. The fast build-test-observe
-// loop from thread T34: pipe stdin text through `AFMCorrector`, pretty-print the
-// `CorrectionSuggestion` with latency. No sandbox, full debugger + console.
+// loop from thread T34: pipe stdin text through `HybridCorrector` (fast edit-distance
+// path for single words, AFM escalation otherwise), pretty-print the
+// `CorrectionSuggestion` with latency, footprint, and which source ran.
+// No sandbox, full debugger + console.
 //
 //   echo "i cant beleive it" | swift run hydratype-cli
 //
@@ -33,7 +35,7 @@ struct HydraTypeCLI {
     static func main() async {
         FileHandle.standardError.write(Data("hydratype-cli — reading lines from stdin (Ctrl-D to end)\n".utf8))
 
-        let corrector = AFMCorrector()
+        let corrector = HybridCorrector()
         var hadErrors = false
 
         while let line = readLine(strippingNewline: true) {
@@ -51,6 +53,7 @@ struct HydraTypeCLI {
                     print("   alternates: \(result.alternates.joined(separator: " | "))")
                 }
                 print("   noChange:   \(result.noChange)")
+                print("   source:     \(result.source == .fastEditDistance ? "fastEditDistance" : "afm")")
                 print("   latency:    \(ms) ms")
                 print("   footprint:  \(String(format: "%.1f", before)) -> \(String(format: "%.1f", after)) MB (Δ \(String(format: "%.1f", after - before)))")
             } catch {
