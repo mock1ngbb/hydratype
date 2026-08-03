@@ -83,9 +83,12 @@ final class SpikeKeyboardViewController: UIInputViewController {
         let prompt = "i went to teh stroe"
         let t0 = Date()
         do {
-            let session = LanguageModelSession(
-                instructions: "Correct the user's text for intent and tone. Reply with only the corrected sentence."
-            )
+            // Canonical live form: @InstructionsBuilder closure (the WWDC25
+            // `init(instructions: String)` convenience drifts from current docs;
+            // see docs/reference/apple-foundation-models.md §2 "signature drift").
+            let session = LanguageModelSession {
+                "Correct the user's text for intent and tone. Reply with only the corrected sentence."
+            }
             spikeLog.notice("SPIKE step3 session_constructed headroom=\(availableMemoryMB(), format: .fixed(precision: 1)) MB")
 
             let response = try await session.respond(to: prompt)
