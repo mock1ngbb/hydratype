@@ -19,6 +19,7 @@ let package = Package(
         .library(name: "HydraCore", targets: ["HydraCore"]),
         .executable(name: "hydratype-cli", targets: ["hydratype-cli"]),
         .executable(name: "hydracore-check", targets: ["hydracore-check"]),
+        .executable(name: "hydracore-bench", targets: ["hydracore-bench"]),
     ],
     targets: [
         .target(
@@ -33,6 +34,13 @@ let package = Package(
         // / the cicada pre-push gate. The XCTest suite in Tests/ is the richer form.
         .executableTarget(
             name: "hydracore-check",
+            dependencies: ["HydraCore"]
+        ),
+        // Quality/regression harness: `swift run hydracore-bench` runs the fast
+        // edit-distance corrector over a real-typo corpus (see
+        // Sources/hydracore-bench/) reporting latency + accuracy. No live AFM needed.
+        .executableTarget(
+            name: "hydracore-bench",
             dependencies: ["HydraCore"]
         ),
         .testTarget(
