@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# ── Pragmatic Law ────────────────────────────────────────────────────────────
+# Solving the full problem once is always faster than deferring it.
+# This gate exists because catching failures here is strictly cheaper than
+# catching them downstream. Never weaken, skip, or defer.
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# hydratype pre-push — TRACKED, reproducible. Build gate, then cicada Layer 1.
+#
+# WHY THIS FILE EXISTS
+#   Until now this repo's entire pre-push lived in an UNTRACKED
+#   .git/hooks/pre-push with core.hooksPath unset. `git clone` reproduces none
+#   of it, so a fresh clone had no build gate and no policy gate while looking
+#   identically configured. Worse, its cicada tail was:
+#
+#       POLICY_HOOK="$HOME/.local/share/cicada-policy/pre-push-hook.sh"
+#       if [ -x "$POLICY_HOOK" ]; then exec "$POLICY_HOOK" "$@"; fi
+#       exit 0
+#
+#   — a machine-local path guarded by a fail-OPEN fallthrough. On any machine
+#   without that file, Layer 1 enforced nothing and said nothing about it.
+#   Measured in a scratch repo with .github/workflows/ci.yml committed and the
+#   central copy absent: that shape exits 0 and the push lands.
+#
+#   This file is tracked, and core.hooksPath points at scripts/hooks (set by
+#   scripts/install-git-hooks.sh), so a clone that runs the installer gets the
+#   real chain. The cicada half resolves through the vendored, fail-CLOSED
+#   bootstrap, which REFUSES when the enforcer cannot be resolved.
+#
+# stygian-hooks-install composes its managed block into the EFFECTIVE hook, so
+# re-running it after the hooksPath change puts that block at the top of this
+# file. That is expected; do not hand-edit the managed block.
+set -uo pipefail
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+
+# git feeds <local-ref> <local-sha> <remote-ref> <remote-sha> on stdin, and both
+# consumers below want it. Buffer once; a drained stdin is not an empty ref
+# list, it is a gate iterating zero refs and passing vacuously.
+STDIN_BUF="$(cat)"
+
+# ── 1. build gate ──────────────────────────────────────────────────────────
+# Broken Swift must not reach the merge-warden auto-merge path, whose cicada
+# proof is policy-only.
+if [ -x "$ROOT/scripts/gate.sh" ]; then
+  if ! GATE_DIFF_BASE="origin/hee-haw" bash "$ROOT/scripts/gate.sh"; then
+    echo "[pre-push] scripts/gate.sh FAILED — fix before pushing." >&2
+    exit 1
+  fi
+else
+  echo "[pre-push] push REFUSED: $ROOT/scripts/gate.sh is missing." >&2
+  echo "[pre-push] The build gate cannot run, so nothing was verified. A gate that" >&2
+  echo "[pre-push] cannot run is not a gate; the previous version warned and continued." >&2
+  exit 1
+fi
+
+# ── 2. cicada Layer 1, fail-closed ─────────────────────────────────────────
+BOOTSTRAP="$ROOT/scripts/hooks/cicada-policy-bootstrap.sh"
+if [ ! -f "$BOOTSTRAP" ]; then
+  echo "[pre-push] push REFUSED: $BOOTSTRAP is missing." >&2
+  echo "[pre-push] cicada Layer 1 cannot run. Rebase onto hee-haw." >&2
+  exit 1
+fi
+if ! printf '%s\n' "$STDIN_BUF" | bash "$BOOTSTRAP" "$@"; then
+  echo "[pre-push] cicada policy gate REFUSED the push (clause named above)." >&2
+  exit 1
+fi
