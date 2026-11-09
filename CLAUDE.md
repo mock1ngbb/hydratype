@@ -40,7 +40,7 @@ memory. Index: [`docs/reference/INDEX.md`](docs/reference/INDEX.md). System grap
 ```sh
 # Shared core (Xcode toolchain required):
 cd Packages/HydraCore && swift build && swift run hydracore-check && swift test
-scripts/gate.sh                          # build + logic gate + XCTest (cicada pre-push)
+scripts/gate.sh                          # build + logic gate + XCTest (run by scripts/verify.sh)
 echo "i cant beleive it" | swift run hydratype-cli   # real on-device correction
 
 # Xcode app + keyboard (project.yml is source of truth; .xcodeproj is generated):
@@ -54,14 +54,14 @@ xcodebuild -project HydraType.xcodeproj -scheme HydraType \
 These are enforced by hooks/gates — this section only documents *where*, so you know
 what will fire (the enforcement is not this markdown):
 
-- **CI/CD gate**: charon-cicada (`.cicada-policy.yml`) — pre-push hook; GitHub Actions
-  structurally forbidden.
+- **Landing**: trunkq (serial label-driven land queue). GitHub Actions is not used.
 - **Git flow**: trunk `hee-haw`; worktree + `wt/<topic>-<unixtimestamp>` branch shape
   and "no work in main checkout" are enforced by the fleet's block hooks; self-merge
   is blocked by `agent-self-merge-guard`.
-- **Verify gate**: `scripts/gate.sh` (build + `hydracore-check` + `swift test`).
-  Wiring it into the cicada pre-push hook is tracked in WyrdWeaver (mechanization,
-  not a prose rule).
+- **Verify gate**: `scripts/verify.sh` (erebus deck sync, then `scripts/gate.sh`: build +
+  `hydracore-check` + `swift test`). It exits 2 (could-not-run) when full Xcode is absent,
+  which today is every host. The tracked `scripts/hooks/pre-push` runs only the portable
+  erebus deck check (install once per clone: `bash scripts/install-git-hooks.sh`).
 - **Xcode project**: `.xcodeproj` is gitignored and generated from `project.yml`; the
   gitignore is the mechanism that prevents committing a hand-edited project.
 
@@ -74,14 +74,11 @@ northstar in the bifrost-bridge constitution:
 - `bifrost-bridge/docs/constitutions/cicd/contract-deploy-lifecycle.md`
 - `bifrost-bridge/docs/constitutions/cicd/contract-deploy-manifest.md`
 
-Live path: GitHub push/pull_request → **cicd-intake** worker (`cicada/policy` proof) → **merge-warden**
-auto-squash-merges CLEAN PRs with a green `cicada/policy`; **cicd-queue** runs ephemeral Sprite
-builds. hydratype is enrolled in crypt-core vault-keeper (script gate target `hydratype-gate`).
+Landing is trunkq: a verified PR lands through the serial label-driven land queue. Deploy
+targets are read from `.bifrost/deploy-manifest.json` at deploy time.
 
-- **Auto pick-up + merge**: merge-warden cron (`*/10`), watches `mock1ngbb/hydratype`.
-- **Manual fire + merge**: `bash scripts/cicada-deploy.sh` (enqueue+drain), `POST /v1/run`
-  on merge-warden (`PROXY_API_KEY`), or `gh pr merge <n> --squash`.
-- **Do not** add `.github/workflows/*` — cicada policy forbids GitHub Actions.
+- **Merge**: `gh pr merge <n> --squash`, or let trunkq land it.
+- **Do not** add `.github/workflows/*` — GitHub Actions is not used in this ecosystem.
 
 ## Constitution — The Erebus Compact
 

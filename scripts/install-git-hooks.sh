@@ -11,7 +11,7 @@
 # Run once per clone / worktree:  bash scripts/install-git-hooks.sh
 #
 # Without this, git reads .git/hooks/ — which is untracked, so a fresh clone has
-# no build gate and no cicada Layer 1 while looking identically configured.
+# no build gate while looking identically configured.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -25,7 +25,7 @@ echo "[install-git-hooks] core.hooksPath -> scripts/hooks"
 if command -v stygian-hooks-install >/dev/null 2>&1; then
   stygian-hooks-install "$ROOT" || {
     echo "[install-git-hooks] WARNING: stygian-hooks-install failed; its managed block" >&2
-    echo "[install-git-hooks] is not on the effective hook. The cicada gate below is" >&2
+    echo "[install-git-hooks] is not on the effective hook. The build gate is" >&2
     echo "[install-git-hooks] unaffected and still enforced." >&2
   }
 else

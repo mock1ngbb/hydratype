@@ -14,7 +14,7 @@
 #
 # What this file DOES add is a check that the gate can run at all. Pushing from
 # a clone whose core.hooksPath was never set runs NO hook — that is the exact
-# unenforced-and-silent state this repo's Layer 1 work exists to end — so that
+# unenforced-and-silent state the tracked hook exists to end — so that
 # state is refused here rather than discovered later.
 set -euo pipefail
 

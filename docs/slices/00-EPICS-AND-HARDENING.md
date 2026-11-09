@@ -99,5 +99,5 @@ create/edit, embeds the API surface and constraints it needs inline (so no
 cross-referencing or judgement is required), lists numbered steps, and gives a
 binary **Done-when** acceptance check. If a slice says "SPIKE," the deliverable is
 a findings note + a go/no-go, not production code. Work one slice per branch
-(`wt/<slice-id>-<ts>`), open a PR, let the cicada pre-push gate run. Never add a
-`.github/workflows/*` file — CI/CD is charon-cicada (`.cicada-policy.yml`).
+(`wt/<slice-id>-<ts>`), open a PR, let the pre-push gate run. Never add a
+`.github/workflows/*` file — landing is trunkq.

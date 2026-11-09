@@ -15,8 +15,7 @@ Foundation Models** (`@Generable` guided generation) instead of n-gram/edit-dist
   (`DifferentialPrivacy`), benchmark harness (`hydracore-bench`), structured-output hardening.
 - **On-device AFM:** **macOS M5 pivot `IN_PROCESS_OK`** — `"i cant beleive it"` → `"I can't believe it."`,
   ~1.6s one-shot, footprint 3.6→13.2 MB (model runs in a separate OS process).
-- **CI/CD:** charon-cicada — GitHub webhook → `cicd-intake` → **merge-warden auto-merge**
-  (hydratype watched, auto + manual fire proven).
+- **CI/CD:** trunkq land queue; local pre-push build gate.
 - **wyrd:** fixed + durable (task filing works; R2 backup is the one broken piece — see below).
 
 ---
@@ -28,18 +27,17 @@ Foundation Models** (`@Generable` guided generation) instead of n-gram/edit-dist
    ~50–60 MB keyboard-jetsam question). Fill the spike README verdict. Wyrd `deae238a`.
 2. **wyrd R2 backup 500** — `bifrost-backups.r2.dev` returns HTTP 500; backups aren't reaching R2.
    Wyrd `064f406a`.
-3. **Wire a real deploy lane** (Xcode Cloud / fastlane) → enables a server-side `cicada/build` check
-   (merge-warden's `cicada/policy` proof is currently policy-only). Wyrd `669a0f3c`.
+3. **Wire a real deploy lane** (Xcode Cloud / fastlane). Wyrd `669a0f3c`.
 
 ---
 
 ## How the machine works (read before pushing)
 
-- **Worktrees:** branch from `origin/hee-haw`, work in `wt/<topic>-<ts>`, open a PR. **merge-warden
-  auto-squash-merges** CLEAN PRs with a green `cicada/policy`; `gh pr merge <n> --squash` also works.
-  Never commit to the main checkout.
-- **Gate:** `scripts/gate.sh` (swift build + `hydracore-check` + XCTest + erebus deck-sync). Fail-closed:
-  docs-only pushes skip the slow Swift gate; any code change runs the full gate.
+- **Worktrees:** branch from `origin/hee-haw`, work in `wt/<topic>-<ts>`, open a PR; trunkq lands
+  it (`gh pr merge <n> --squash` also works). Never commit to the main checkout.
+- **Gate:** `scripts/verify.sh` (erebus deck-sync, then `scripts/gate.sh`: swift build +
+  `hydracore-check` + XCTest). Needs full Xcode; without it the verdict is could-not-run (exit 2).
+  pre-push runs only the erebus deck-sync check, the part every host can run.
 - **Tasks:** `wyrd "<title>"` files into the current project's lane. Full open-item ledger + IDs:
   `docs/RESUME.md`.
 

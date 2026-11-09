@@ -7,8 +7,8 @@ review**. Internal testing (App Store Connect team members) does not go through
 App Review; external testing does.
 
 > ⛔️ **CI/CD note:** GitHub Actions is FORBIDDEN across this ecosystem. Build/
-> sign/ship is Xcode / fastlane / Xcode Cloud only. charon-cicada owns intake and
-> policy gating (`.cicada-policy.yml`). Never add a `.github/workflows/*` file.
+> sign/ship is Xcode / fastlane / Xcode Cloud only. Landing is trunkq.
+> Never add a `.github/workflows/*` file.
 
 ---
 
@@ -115,5 +115,4 @@ Unblock requires (each a follow-up slice/task, not vibes):
   `bf` at use time, never committed.
 - **Loud:** an expired or lapsed build is treated as an outage, not silently
   tolerated.
-- **No GitHub Actions:** distribution is Xcode / fastlane / Xcode Cloud only,
-  under charon-cicada gating.
+- **No GitHub Actions:** distribution is Xcode / fastlane / Xcode Cloud only.
