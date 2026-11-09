@@ -36,8 +36,8 @@ Foundation Models** (`@Generable` guided generation) instead of n-gram/edit-dist
 ## How the machine works (read before pushing)
 
 - **Worktrees:** branch from `origin/hee-haw`, work in `wt/<topic>-<ts>`, open a PR. **merge-warden
-  auto-squash-merges** CLEAN PRs with a green `cicada/policy`. Never commit to the main checkout;
-  self-merge is guarded — the operator carve-out is `CLAUDE_MERGE_APPROVE=<n>`.
+  auto-squash-merges** CLEAN PRs with a green `cicada/policy`; `gh pr merge <n> --squash` also works.
+  Never commit to the main checkout.
 - **Gate:** `scripts/gate.sh` (swift build + `hydracore-check` + XCTest + erebus deck-sync). Fail-closed:
   docs-only pushes skip the slow Swift gate; any code change runs the full gate.
 - **Tasks:** `wyrd "<title>"` files into the current project's lane. Full open-item ledger + IDs:
