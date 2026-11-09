@@ -31,7 +31,7 @@ let package = Package(
         ),
         // Framework-free runnable logic gate (no XCTest needed): `swift run
         // hydracore-check` verifies the pure-logic core and is wired into scripts/gate.sh
-        // / the cicada pre-push gate. The XCTest suite in Tests/ is the richer form.
+        // / the pre-push gate. The XCTest suite in Tests/ is the richer form.
         .executableTarget(
             name: "hydracore-check",
             dependencies: ["HydraCore"]

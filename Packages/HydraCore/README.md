@@ -37,7 +37,7 @@ Foundation Models, not a bug.
 swift build
 
 # Runnable logic gate — mode engine, store round-trip, loud error paths.
-# Exits non-zero on the first failure. Wired into scripts/gate.sh / cicada pre-push.
+# Exits non-zero on the first failure. Wired into scripts/gate.sh / pre-push.
 swift run hydracore-check
 
 # Full XCTest suite:

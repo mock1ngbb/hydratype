@@ -61,6 +61,6 @@ xcodebuild -project HydraType.xcodeproj -scheme HydraType \
 
 ## CI/CD
 
-Governed by charon-cicada (`.cicada-policy.yml`); GitHub Actions is structurally forbidden in this
-ecosystem. The pre-push gate is the hard gate. See `docs/` for the design slices, reference material,
+Landing is trunkq; GitHub Actions is not used in this ecosystem. The verifier is
+`scripts/verify.sh` (erebus deck sync + the Swift gate `scripts/gate.sh`, which needs full Xcode). See `docs/` for the design slices, reference material,
 and architecture notes.

@@ -1,7 +1,7 @@
 // Runnable logic gate for HydraCore — a dependency-free harness that runs the same
 // assertions as the XCTest suite but needs no test framework, so it executes with the
 // bare Command Line Tools toolchain. `swift run hydracore-check` exits 0 on all-pass,
-// non-zero (LOUD) on the first failure. Intended for the cicada pre-push gate.
+// non-zero (LOUD) on the first failure. Intended for the pre-push gate.
 
 import Foundation
 import HydraCore
