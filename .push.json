@@ -1,0 +1,8 @@
+{
+  "trunk": "hee-haw",
+  "hooks": {
+    "require_hooks_path": "scripts/hooks",
+    "label": "tracked pre-push gate",
+    "repair": ["bash scripts/install-git-hooks.sh"]
+  }
+}
